@@ -28,7 +28,7 @@ layers内参数：请参考pytorch的对应方法参数
     },
     "layers": {
         "0": {
-            "type": "con2d",  # 必须
+            "type": "Conv2d",  # 必须
             "out_channels": 3,  # 必须
             "kernel_size": 3,  # 必须
             "stride": 1,  # 默认
@@ -39,7 +39,7 @@ layers内参数：请参考pytorch的对应方法参数
             "padding_mode": "zeros"  # 默认
         },
         "1": {
-            "type": "maxpool2d",  # 必须
+            "type": "MaxPool2d",  # 必须
             "kernel_size": 3,  # 必须
             "stride": 3,  # 默认=kernel_size
             "padding": 0,  # 默认
@@ -62,7 +62,7 @@ layers内参数：请参考pytorch的对应方法参数
             "type": "shortcut"  # 必须
         },
         "5": {
-            "type": "maxpool2d",  # 必须
+            "type": "MaxPool2d",  # 必须
             "kernel_size": 3,  # 必须
             "stride": 3,  # 默认=kernel_size
             "padding": 0,  # 默认
@@ -84,6 +84,18 @@ layers内参数：请参考pytorch的对应方法参数
         "8": {
             "type": "shortcut"  # 必须
         },
+        "10": {
+            "type": "ReLU",  # 必须
+            "inplace": False  # 默认
+        },
+        "11": {
+            "type": "BatchNorm2d",
+            # "num_features": 1,  # 默认=in_channels
+            "eps": 1e-5,  # 默认
+            "momentum": 0.1,  # 默认
+            "affine": True,  # 默认
+            "track_running_stats": True  # 默认
+        },
         "9": {
             "type": "shortcut"  # 必须
         }
@@ -97,7 +109,9 @@ layers内参数：请参考pytorch的对应方法参数
         "5": ["6"],
         "6": ["7"],
         "7": ["8"],
-        "8": ["9"],
+        "8": ["10"],
+        "10": ["11"],
+        "11": ["9"],
         "4": ["9"]
     },
     "start_to_end": [("0", "9")]
