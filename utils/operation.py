@@ -2,6 +2,7 @@ from utils.net import *
 from utils.data import *
 import pandas as pd
 import os
+from utils.loss import *
 
 
 def train(in_channels, out_channels, net_name, lr, csv_path,
@@ -34,6 +35,8 @@ def train(in_channels, out_channels, net_name, lr, csv_path,
     # model.train()  # 启用 BatchNormalization 和 Dropout
     # model.eval()  # 不启用 BatchNormalization 和 Dropout, see https://pytorch.org/docs/stable/nn.html?highlight=module%20eval#torch.nn.Module.eval
     net.to(device)
+
+    dice_loss_weights = torch.Tensor([1, 2, 3, 4, 5, 6, 7, 8]).to(device)
     # 优化器
     optimizer = torch.optim.Adam(net.parameters(), lr=lr)
     # 准备数据
@@ -55,7 +58,10 @@ def train(in_channels, out_channels, net_name, lr, csv_path,
             learn_rate = 0.001
             predicts = net(images)  # 推断
             optimizer.zero_grad()  # 梯度清零
-            loss = create_loss(predicts, labels, num_classes)  # 损失
+            loss = create_ce_loss(predicts, labels, num_classes)  # 损失
+
+            loss += create_dice_loss(predicts, labels, num_classes, dice_loss_weights)
+            loss += create_miou_loss(predicts, labels, num_classes)
             print("loss {}/{}".format(iter, epoch_size), loss)
             epoch_loss += loss.item()
             loss.backward()  # 反向传播
