@@ -7,6 +7,11 @@ import torch
 import os
 from typing import Tuple
 
+from torch.autograd import Variable
+from utils.file import print_dir
+import warnings
+
+
 def encoded(labels):
     """
     将标签图的灰度值转换成类别id
@@ -95,13 +100,12 @@ def crop_resize(image, label, out_size: Tuple, crop_offset: Tuple = (0, 0)):
     return roi_image, roi_label
 
 
-def data_generator(image_root, image_list, label_root, label_list, batch_size, out_size: Tuple,
+def data_generator(load_data, image_list, label_list, batch_size, out_size: Tuple,
                    crop_offset: Tuple = (0, 0)):
     """
     生成训练数据
-    :param image_root: 图片文件的数据集绝对地址
+    :param load_data: 加载数据function, 返回数据root_path
     :param image_list: 图片文件的数据集地址
-    :param label_root: 标签文件的数据集绝对地址
     :param label_list: 标签文件的数据集地址
     :param batch_size: 每批取多少张图片
     :param out_size: 输出的图片尺寸，(h,w)
@@ -112,35 +116,46 @@ def data_generator(image_root, image_list, label_root, label_list, batch_size, o
     out_images = []
     out_labels = []
     out_images_filename = []
+    root_path = load_data()
+    print("The load data root path %s" % root_path)
+    check_path = os.path.join(root_path, image_list[0])
+    if not os.path.isfile(check_path):
+        print_dir(root_path)
+        raise Exception("Check that the data set path `{}` is correct".format(check_path))
     while True:
         np.random.shuffle(indices)
         for i in indices:
             try:
-                image = cv2.imread(os.path.join(image_root, image_list[i]))  # (h,w,c) BGR格式
-                label = cv2.imread(os.path.join(label_root, label_list[i]), cv2.IMREAD_GRAYSCALE)  # (h,w)
-            except:
-                continue
-            # crop & resize
-            image, label = crop_resize(image, label, out_size, crop_offset)  # image=shape(h,w,c), label=shape(h,w)
-            # encode
-            label = encoded(label)
+                image = cv2.imread(os.path.join(root_path, image_list[i]))  # (h,w,c) BGR格式
+                label = cv2.imread(os.path.join(root_path, label_list[i]), cv2.IMREAD_GRAYSCALE)  # (h,w)
+            except:  # 发生异常，执行这块代码
+                warnings.warn("The image file `{}` or label file `{}` is no exists".format(
+                    os.path.join(root_path, image_list[i]),
+                    os.path.join(root_path, label_list[i])))
+            else:  # 如果没有异常执行这块代码
+                # crop & resize
+                image, label = crop_resize(image, label, out_size, crop_offset)  # image=shape(h,w,c), label=shape(h,w)
+                # encode
+                label = encoded(label)
 
-            out_images.append(image)
-            out_labels.append(label)
-            out_images_filename.append(image_list[i])
-            if len(out_images) == batch_size:
-                out_images = np.array(out_images, dtype=np.float32)
-                out_labels = np.array(out_labels, dtype=np.int64)
-                # BGR转换成RGB
-                out_images = out_images[:, :, :, ::-1]
-                # 维度改成(n,c,h,w)
-                out_images = out_images.transpose(0, 3, 1, 2)
-                # 归一化 -1 ~ 1
-                out_images = out_images*2/255 - 1
-                yield torch.from_numpy(out_images), torch.from_numpy(out_labels).long()
-                out_images = []
-                out_labels = []
-                out_images_filename = []
+                out_images.append(image)
+                out_labels.append(label)
+                out_images_filename.append(image_list[i])
+                if len(out_images) == batch_size:
+                    out_images = np.array(out_images, dtype=np.float32)
+                    out_labels = np.array(out_labels, dtype=np.int64)
+                    # BGR转换成RGB
+                    out_images = out_images[:, :, :, ::-1]
+                    # 维度改成(n,c,h,w)
+                    out_images = out_images.transpose(0, 3, 1, 2)
+                    # 归一化 -1 ~ 1
+                    out_images = out_images*2/255 - 1
+                    yield torch.from_numpy(out_images), torch.from_numpy(out_labels).long()  # .requires_grad_(False)
+                    # yield torch.from_numpy(out_images), transforms.ToTensor()(out_labels)
+                    # yield torch.from_numpy(out_images), Variable(torch.from_numpy(out_labels).long(), requires_grad=False)
+                    out_images = []
+                    out_labels = []
+                    out_images_filename = []
 
 
 if __name__ == "__main__":

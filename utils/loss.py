@@ -80,9 +80,9 @@ def create_iou_loss(predicts, labels, num_classes):
     """
 
 
-def create_miou_loss(predicts: torch.Tensor, labels: torch.Tensor, num_classes):
+def get_miou(predicts: torch.Tensor, labels: torch.Tensor, num_classes):
     """
-    创建loss
+    根据混淆矩阵，求miou(其过程不可导)
     :param predicts: shape=(n,c,h,w)
     :param labels: shape=(n,h,w),  one hot format
     :param num_classes: int should equal to channels of predicts
@@ -90,18 +90,37 @@ def create_miou_loss(predicts: torch.Tensor, labels: torch.Tensor, num_classes):
     """
     pred = predicts.argmax(dim=1)  # 将预测值转换成one hot形式, (n, h, w)
 
-    total_loss = 0.0
+    total_miou = 0.0
     for lt, lp in zip(labels, pred):  # 遍历每个样本
         hist = _fast_hist(label_true=lt, label_pred=lp, n_class=num_classes).float()
         iou = hist.diag()/(hist.sum(0) + hist.sum(1) - hist.diag())
-        total_loss += (1 - iou.mean())
+        total_miou += iou.mean()
 
-    return total_loss
+    return total_miou
+
+
+def create_iou_loss(predicts: torch.Tensor, labels: torch.Tensor, num_classes):
+    """
+    计算iou损失
+    see: https://zhuanlan.zhihu.com/p/101773544
+    :param predicts: shape=(n,c,h,w)
+    :param labels: shape=(n,h,w)
+    :param num_classes: 分类的类别数
+    :return: 本批次的平均iou loss值
+    """
+    softmax_predict = torch.softmax(predicts, dim=1)
+    labels_one_hot = make_one_hot(labels, num_classes)
+    inter = softmax_predict * labels_one_hot
+    iou = inter.sum(dim=(-2, -1)) / (softmax_predict + labels_one_hot - inter).sum(dim=(-2, -1))
+    return 1-iou.mean()
 
 
 def _dice_loss(predicts: torch.Tensor, labels: torch.Tensor):
     """
     计算dice loss，注意perdicts与labels的纬度要对应
+    计算公式: 1 - (2|X交Y| +1) / (|X| + |Y| +1)
+    see: https://zhuanlan.zhihu.com/p/86704421
+    see: https://zhuanlan.zhihu.com/p/101773544
     :param predicts: shape = (n,h,w) or (n,c,h,w)
     :param labels: shape = (n,h,w) or (n,c,h,w)
     :return: loss shape = (n) or (n,c)
@@ -122,11 +141,19 @@ def make_one_hot(labels: torch.Tensor, num_classes):
 
 
 def create_dice_loss(predicts: torch.Tensor, labels: torch.Tensor, num_classes, weights=None):
+    """
+    求dice loss损失
+    :param predicts: shape=(n,c,h,w)
+    :param labels: shape=(n,h,w)
+    :param num_classes: 分类的类别数
+    :param weights: 每个类别损失权重, shape=(num_classes)
+    :return: 本批次的平均dice loss值
+    """
     # 求每个通道的dice_loss
-    nc_loss = _dice_loss(predicts, make_one_hot(labels, num_classes))
+    nc_loss = _dice_loss(torch.softmax(predicts, dim=1), make_one_hot(labels, num_classes))
     if weights is not None:
         nc_loss = nc_loss * weights
-    return nc_loss.sum()
+    return nc_loss.mean()
 
 
 def create_ce_loss(predicts: torch.Tensor, labels: torch.Tensor, num_classes):
