@@ -73,16 +73,16 @@ def decode(labels):
     return decoded_labels
 
 
-def crop_resize(image, label, out_size: Tuple, crop_offset: Tuple = (0, 0)):
+def crop_resize(image, label, resize: Tuple, crop_offset: Tuple = (0, 0)):
     """
     裁剪图片
     :param image: 输入图片,shape=(h,w,c)
     :param label: 标签图片,shape=(h,w)
-    :param out_size: 输出图片尺寸，(h,w)
+    :param resize: 输出图片尺寸，(h,w)
     :param crop_offset: 截掉多少，(start_height, start_width)
     :return: roi_image=shape(h,w,c), roi_label=shape(h,w)
     """
-    out_size = out_size[::-1]  # (h,w)转(w,h),resize格式需要(w,h)
+    out_size = resize[::-1]  # (h,w)转(w,h),resize格式需要(w,h)
     roi_image = image[crop_offset[0]:, crop_offset[1]:]  # crop
     # interpolation - 插值方法。共有5种：
     # １)INTER_NEAREST - 最近邻插值法
@@ -100,7 +100,7 @@ def crop_resize(image, label, out_size: Tuple, crop_offset: Tuple = (0, 0)):
     return roi_image, roi_label
 
 
-def data_generator(load_data, image_list, label_list, batch_size, out_size: Tuple,
+def data_generator(load_data, image_list, label_list, batch_size, resize: Tuple,
                    crop_offset: Tuple = (0, 0)):
     """
     生成训练数据
@@ -108,7 +108,7 @@ def data_generator(load_data, image_list, label_list, batch_size, out_size: Tupl
     :param image_list: 图片文件的数据集地址
     :param label_list: 标签文件的数据集地址
     :param batch_size: 每批取多少张图片
-    :param out_size: 输出的图片尺寸，(h,w)
+    :param resize: 输出的图片尺寸，(h,w)
     :param crop_offset: 将原始图片截掉多少，(start_height, start_width)
     :return: out_images=shape(batch_size,c,h,w),out_labels=shape(batch_size,h,w)
     """
@@ -138,9 +138,9 @@ def data_generator(load_data, image_list, label_list, batch_size, out_size: Tupl
                         os.path.join(root_path, image_list[i]),
                         os.path.join(root_path, label_list[i])))
                     continue
-                if out_size is not None and crop_offset is not None:
+                if resize is not None and crop_offset is not None:
                     # crop & resize
-                    image, label = crop_resize(image, label, out_size, crop_offset)  # image=shape(h,w,c), label=shape(h,w)
+                    image, label = crop_resize(image, label, resize, crop_offset)  # image=shape(h,w,c), label=shape(h,w)
                 else:
                     print("The out_size and crop_offset is not set.")
                 # encode

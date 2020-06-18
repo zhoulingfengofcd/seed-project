@@ -17,8 +17,8 @@ if __name__ == '__main__':
     train(in_channels=3, out_channels=8, net_name="deeplabv3", lr=0.001, csv_path="seed-project/data_list/train.csv",
           load_data=copy_dataset(copy_to_local_root="/cache/datasets",
                                  source_data_path='s3://zlf-rubbish-data/datasets/original.zip'),
-          batch_size=16, out_size=(416, 416), crop_offset=(0, 0),
-          epoch_begin=0, epoch_num=1,
+          batch_size=16, resize=(512, 512), crop_offset=(730, 0),
+          epoch_begin=0, epoch_num=5,
           num_classes=8,
           save_model=save_model(local_root="/cache/model", copy_root="s3://zlf-rubbish-data/outputs/"),
           load_weight=load_weight(
