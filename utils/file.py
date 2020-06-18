@@ -119,6 +119,8 @@ def save_model(local_root, copy_root=None):
     :return:
     """
     def _save_model(model, temp_model_name):
+        if not os.path.isdir(local_root):
+            os.makedirs(local_root)
         ckpt_name = os.path.join(local_root, temp_model_name)
         torch.save(model.state_dict(), ckpt_name)
         if copy_root is not None:

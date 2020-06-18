@@ -133,8 +133,16 @@ def data_generator(load_data, image_list, label_list, batch_size, out_size: Tupl
                     os.path.join(root_path, image_list[i]),
                     os.path.join(root_path, label_list[i])))
             else:  # 如果没有异常执行这块代码
-                # crop & resize
-                image, label = crop_resize(image, label, out_size, crop_offset)  # image=shape(h,w,c), label=shape(h,w)
+                if image is None or label is None:
+                    warnings.warn("The image file `{}` or label file `{}` is no exists".format(
+                        os.path.join(root_path, image_list[i]),
+                        os.path.join(root_path, label_list[i])))
+                    continue
+                if out_size is not None and crop_offset is not None:
+                    # crop & resize
+                    image, label = crop_resize(image, label, out_size, crop_offset)  # image=shape(h,w,c), label=shape(h,w)
+                else:
+                    print("The out_size and crop_offset is not set.")
                 # encode
                 label = encoded(label)
 
@@ -156,6 +164,28 @@ def data_generator(load_data, image_list, label_list, batch_size, out_size: Tupl
                     out_images = []
                     out_labels = []
                     out_images_filename = []
+
+
+def read_image(image_path, out_size, crop_offset):
+    image = cv2.imread(image_path)  # (h,w,c) BGR格式
+    if out_size is not None and crop_offset is not None:
+        # crop & resize
+        image, label = crop_resize(image, None, out_size, crop_offset)  # image=shape(h,w,c), label=shape(h,w)
+    else:
+        print("The out_size and crop_offset is not set.")
+
+    # out_labels.append(label)
+    # out_images_filename.append(image_list[i])
+    # if len(out_images) == batch_size:
+    out_images = np.array([image], dtype=np.float32)
+    # out_labels = np.array(out_labels, dtype=np.int64)
+    # BGR转换成RGB
+    out_images = out_images[:, :, :, ::-1]
+    # 维度改成(n,c,h,w)
+    out_images = out_images.transpose(0, 3, 1, 2)
+    # 归一化 -1 ~ 1
+    out_images = out_images * 2 / 255 - 1
+    return torch.from_numpy(out_images)
 
 
 if __name__ == "__main__":

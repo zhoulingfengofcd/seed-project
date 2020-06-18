@@ -3,6 +3,7 @@ from utils.data import *
 import pandas as pd
 from utils.loss import *
 import datetime
+
 try:
     import moxing as mox
 except:
@@ -49,12 +50,12 @@ def train(in_channels, out_channels, net_name, lr, csv_path, load_data,
                                np.array(df['label']),
                                batch_size, out_size, crop_offset)
     # 训练
-    epoch_size = int(len(df)/batch_size)  # 1个epoch包含的batch数目
+    epoch_size = int(len(df) / batch_size)  # 1个epoch包含的batch数目
     for epoch in range(epoch_begin, epoch_num):
         print("The epoch {} start.".format(epoch))
         start = datetime.datetime.now()
         epoch_loss = 0.0
-        for iter in range(1, epoch_size+1):
+        for iter in range(1, epoch_size + 1):
             images, labels = next(generator)
             images = images.to(device)
             labels = labels.to(device)
@@ -72,8 +73,41 @@ def train(in_channels, out_channels, net_name, lr, csv_path, load_data,
             optimizer.step()  # 更新网络参数
 
         print("The epoch {} end, epoch loss:{}, miou:{}, execution time:{}".format(epoch, epoch_loss, miou,
-                                                                           datetime.datetime.now()-start))
+                                                                                   datetime.datetime.now() - start))
         # scheduler.step()  # 更新学习率
         # 保存模型
-        model_name = f"ckpt_%d_%.2f_%.2f.pth" % (epoch, miou, epoch_loss)
+        model_name = f"ckpt_%d_%.2f.pth" % (epoch, epoch_loss)
         save_model(net, model_name)
+
+
+def test(in_channels, out_channels, net_name,
+         weights_path, image_path, out_size, crop_offset, **kwargs):
+    """
+    测试网络
+    :param in_channels: 输入通道
+    :param out_channels: 输出通道
+    :param net_name: 网络名称
+    :param weights_path: 模型权重文件路径
+    :param image_path: 测试图片地址
+    :param out_size: 网络输入的图片尺寸
+    :param crop_offset: 剪切偏移量
+    :param kwargs:
+    :return:
+    """
+
+    device = torch.device("cpu" if torch.cuda.is_available() else "cpu")
+
+    # 网络
+    net = create_net(in_channels, out_channels, net_name, **kwargs)
+    # net.train()  # 启用 BatchNormalization 和 Dropout
+    net.eval()  # 不启用 BatchNormalization 和 Dropout, see https://pytorch.org/docs/stable/nn.html?highlight=module%20eval#torch.nn.Module.eval
+    net = net.to(device)
+    # Load checkpoint weights
+    net.load_state_dict(torch.load(weights_path))
+    with torch.no_grad():
+        image = read_image(image_path, out_size, crop_offset)
+        image = image.to(device)
+        predicts = net(image)  # 推断
+        convert = predicts.permute((0, 2, 3, 1)).argmax(dim=3)
+        plt.imshow(decode(convert[0]))
+        plt.show()

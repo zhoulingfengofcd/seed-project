@@ -140,8 +140,10 @@ class ResNet(nn.Module):
 
     def _load_pretrained_model(self, load_weight=None):
         if load_weight is None:
+            print("load ResNet pretrained weight from https://download.pytorch.org/models/resnet101-5d3b4d8f.pth")
             pretrain_dict = model_zoo.load_url('https://download.pytorch.org/models/resnet101-5d3b4d8f.pth')
         else:
+            print("load ResNet pretrained weight from load_weight() function")
             pretrain_dict = load_weight()
         model_dict = {}
         state_dict = self.state_dict()
