@@ -55,7 +55,7 @@ def decode(labels):
     :param labels: shape=(h,w)
     :return:
     """
-    decoded_labels = np.zeros_like(labels, dtype=np.int8)
+    decoded_labels = torch.zeros_like(labels, dtype=torch.uint8)
     # 1
     decoded_labels[labels == 1] = 204
     # 2
@@ -95,6 +95,35 @@ def crop_resize(image, label, resize: Tuple, crop_offset: Tuple = (0, 0)):
     if label is not None:
         roi_label = label[crop_offset[0]:, crop_offset[1]:]
         roi_label = cv2.resize(roi_label, out_size, interpolation=cv2.INTER_NEAREST)
+    else:
+        roi_label = None
+    return roi_image, roi_label
+
+
+def recover_crop_resize(image, label, resize: Tuple, crop_offset: Tuple = (0, 0)):
+    """
+    恢复裁剪
+    :param image: 输入图片,shape=(h,w,c)
+    :param label: 标签图片,shape=(h,w)
+    :param resize: 输出图片尺寸，(h,w)
+    :param crop_offset: 截掉多少，(start_height, start_width)
+    :return: roi_image=shape(h,w,c), roi_label=shape(h,w)
+    """
+    out_size = resize[::-1]  # (h,w)转(w,h),resize格式需要(w,h)
+    # interpolation - 插值方法。共有5种：
+    # １)INTER_NEAREST - 最近邻插值法
+    # ２)INTER_LINEAR - 双线性插值法（默认）
+    # ３)INTER_AREA - 基于局部像素的重采样（resampling using pixel area relation）。对于图像抽取（image decimation）来说，
+    # 这可能是一个更好的方法。但如果是放大图像时，它和最近邻法的效果类似。
+    # ４)INTER_CUBIC - 基于4x4像素邻域的3次插值法
+    # ５)INTER_LANCZOS4 - 基于8x8像素邻域的Lanczos插值
+    roi_image = cv2.resize(image, out_size, interpolation=cv2.INTER_LINEAR)
+    # roi_image = roi_image[crop_offset[0]:, crop_offset[1]:]  # crop
+    roi_image = np.pad(roi_image, ((crop_offset[0], 0), (crop_offset[1], 0), (0, 0)), 'constant', constant_values=(0, 0))
+    if label is not None:
+        roi_label = cv2.resize(label, out_size, interpolation=cv2.INTER_NEAREST)
+        # roi_label = roi_label[crop_offset[0]:, crop_offset[1]:]
+        roi_label = np.pad(roi_label, ((crop_offset[0], crop_offset[1])), 'constant', constant_values=(0, 0))
     else:
         roi_label = None
     return roi_image, roi_label
@@ -166,11 +195,12 @@ def data_generator(load_data, image_list, label_list, batch_size, resize: Tuple,
                     out_images_filename = []
 
 
-def read_image(image_path, out_size, crop_offset):
+def read_image(image_path, resize, crop_offset):
     image = cv2.imread(image_path)  # (h,w,c) BGR格式
-    if out_size is not None and crop_offset is not None:
+    ori_size = image.shape[0:2]
+    if resize is not None and crop_offset is not None:
         # crop & resize
-        image, label = crop_resize(image, None, out_size, crop_offset)  # image=shape(h,w,c), label=shape(h,w)
+        image, label = crop_resize(image, None, resize, crop_offset)  # image=shape(h,w,c), label=shape(h,w)
     else:
         print("The out_size and crop_offset is not set.")
 
@@ -185,7 +215,12 @@ def read_image(image_path, out_size, crop_offset):
     out_images = out_images.transpose(0, 3, 1, 2)
     # 归一化 -1 ~ 1
     out_images = out_images * 2 / 255 - 1
-    return torch.from_numpy(out_images)
+    return torch.from_numpy(out_images), ori_size
+
+
+def recover_image(image, resize, crop_offset):
+    roi_image, roi_label = recover_crop_resize(image, None, resize, crop_offset)
+    return roi_image
 
 
 if __name__ == "__main__":

@@ -21,7 +21,7 @@ if __name__ == '__main__':
           epoch_begin=0, epoch_num=5,
           num_classes=8,
           save_model=save_model(local_root="/cache/model", copy_root="s3://zlf-rubbish-data/outputs/"),
-          load_weight=load_weight(
+          load_resnet_weight=load_weight(
                 pretrained_weights_path='s3://zlf-rubbish-data/weights/resnet101-5d3b4d8f.pth',
                 copy_to_local_root='/cache/weight'),
           )

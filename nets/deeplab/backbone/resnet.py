@@ -72,8 +72,8 @@ class ResNet(nn.Module):
         self._init_weight()
 
         if pretrained:
-            if "load_weight" in kwargs:
-                self._load_pretrained_model(kwargs['load_weight'])
+            if "load_resnet_weight" in kwargs:
+                self._load_pretrained_model(kwargs['load_resnet_weight'])
             else:
                 self._load_pretrained_model()
 

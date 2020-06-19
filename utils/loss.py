@@ -70,21 +70,11 @@ def _fast_hist(label_true, label_pred, n_class):
     return hist
 
 
-def create_iou_loss(predicts, labels, num_classes):
-    """
-    计算iou
-    :param predicts: shape=(-1, classes)
-    :param labels: shape=(-1, 1)
-    :param num_classes: 分类数量
-    :return:
-    """
-
-
 def get_miou(predicts: torch.Tensor, labels: torch.Tensor, num_classes):
     """
     根据混淆矩阵，求miou(其过程不可导)
     :param predicts: shape=(n,c,h,w)
-    :param labels: shape=(n,h,w),  one hot format
+    :param labels: shape=(n,h,w),  one hot format, 每个像素点对应于一个类别（用数字表示0,1,2,…,num_classes）
     :param num_classes: int should equal to channels of predicts
     :return: loss, mean_iou
     """
@@ -118,7 +108,7 @@ def create_iou_loss(predicts: torch.Tensor, labels: torch.Tensor, num_classes):
 def _dice_loss(predicts: torch.Tensor, labels: torch.Tensor):
     """
     计算dice loss，注意perdicts与labels的纬度要对应
-    计算公式: 1 - (2|X交Y| +1) / (|X| + |Y| +1)
+    计算公式: 1 - (2|X交Y|) / (|X|^2 + |Y|^2)
     see: https://zhuanlan.zhihu.com/p/86704421
     see: https://zhuanlan.zhihu.com/p/101773544
     :param predicts: shape = (n,h,w) or (n,c,h,w)
@@ -126,7 +116,7 @@ def _dice_loss(predicts: torch.Tensor, labels: torch.Tensor):
     :return: loss shape = (n) or (n,c)
     """
     inter = (predicts * labels).sum(dim=(-2, -1))
-    loss = 1 - (2*inter+1) / (predicts.sum(dim=(-2, -1)) + labels.sum(dim=(-2, -1)) + 1)
+    loss = 1 - (2*inter) / ((predicts**2 + labels**2).sum(dim=(-2, -1)) + 1e-16)
     return loss
 
 
@@ -165,12 +155,68 @@ def create_ce_loss(predicts: torch.Tensor, labels: torch.Tensor, num_classes):
     :return: loss, mean_iou
     """
     # 维度换位(n,h,w,c)
-    predicts = predicts.permute((0, 2, 3, 1))
+    pred = predicts.permute((0, 2, 3, 1))
     # reshape to (-1, num_classes) 每个像素在每种分类上都有一个概率
-    predicts = predicts.reshape((-1, num_classes))
+    pred = pred.reshape((-1, num_classes))
     # bce with dice
-    ce_loss = F.cross_entropy(input=predicts, target=labels.flatten())  # log(softmax(input)) -> NLLLoss(input, target)
+    ce_loss = F.cross_entropy(input=pred, target=labels.flatten())  # log(softmax(input)) -> NLLLoss(input, target)
     return ce_loss
+
+
+def test_dice_loss():
+    predict = torch.Tensor([
+        [
+            [
+                [1, 2],
+                [3, 4]
+            ],
+            [
+                [1, 2],
+                [3, 4]
+            ],
+            [
+                [1, 2],
+                [3, 4]
+            ],
+        ],
+        [
+            [
+                [1, 2],
+                [3, 4]
+            ],
+            [
+                [1, 2],
+                [3, 4]
+            ],
+            [
+                [1, 2],
+                [3, 4]
+            ],
+        ]
+    ])
+    print(predict.shape)
+    target = torch.LongTensor([
+        [
+            [0, 1],
+            [2, 0]
+        ],
+        [
+            [0, 1],
+            [2, 0]
+        ]
+    ], )
+    print(target.shape)
+    # create_dice_loss(predict, target, 3)
+    pred = torch.Tensor([
+        [0.333, 0.333],
+        [0.333, 0.333]
+    ])
+    tar = torch.LongTensor([
+        [1, 1],
+        [1, 1]
+    ])
+    loss = _dice_loss(pred, tar)
+    print(loss)
 
 
 if __name__ == '__main__':
@@ -241,15 +287,16 @@ if __name__ == '__main__':
     # g = torch.Tensor([[1, 2], [3, 4]])
     # h = torch.Tensor([[5, 6], [7, 8]])
     # print(_bbox_wh_iou(g, h))
-    a = torch.Tensor([
-        [
-            [1, 2, 3],
-            [4, 5, 6]
-        ],
-        [
-            [1, 2, 3],
-            [4, 5, 6]
-        ]
-    ])
-    a.expand(2, 8, 2, 3)
-    print(a)
+    # a = torch.Tensor([
+    #     [
+    #         [1, 2, 3],
+    #         [4, 5, 6]
+    #     ],
+    #     [
+    #         [1, 2, 3],
+    #         [4, 5, 6]
+    #     ]
+    # ])
+    # a.expand(2, 8, 2, 3)
+    # print(a)
+    test_dice_loss()

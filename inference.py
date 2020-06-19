@@ -12,7 +12,8 @@ if __name__ == '__main__':
     print(opt)
     test(
         in_channels=3, out_channels=8, net_name="deeplabv3",
-        weights_path=r"D:\AI\project\data\weights\ckpt_0_50.18.pth",
-        image_path=r"D:\AI\project\data\baidu_lane_line\original\Road03/ColorImage_road03/ColorImage/Record003/Camera 5/171206_030116718_Camera_5.jpg", out_size=None, crop_offset=None, pretrained=False
+        weights_path=r"D:\AI\project\data\weights\ckpt_1_32.78.pth",
+        image_path=r"D:\AI\project\data\baidu_lane_line\TestSet\ColorImage\171206_064801346_Camera_5.jpg",
+        resize=(512, 512), crop_offset=(730, 0), pretrained=False
     )
 
