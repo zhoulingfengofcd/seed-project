@@ -48,12 +48,22 @@ def _get_dir(dir_path):
 
 
 def print_dir(root_path):
-    dir_files = os.listdir(root_path)  # 得到该文件夹下所有的文件
+    dir_files = os.listdir(root_path)  # 得到该文件夹下所有的文件(包括目录)
     for file in dir_files:
         file_path = os.path.join(root_path, file)  # 路径拼接成绝对路径
         if os.path.isdir(file_path):  # 如果目录，就递归子目录
             print(file_path)
             print_dir(file_path)
+
+
+def get_all_filename(root_path):
+    all_filename = []
+    dir_files = os.listdir(root_path)  # 得到该文件夹下所有的文件(包括目录)
+    for file in dir_files:
+        file_path = os.path.join(root_path, file)  # 路径拼接成绝对路径
+        if os.path.isfile(file_path):  # 如果文件
+            all_filename.append(file_path)
+    return all_filename
 
 
 def copy_dataset(copy_to_local_root, source_data_path=None):

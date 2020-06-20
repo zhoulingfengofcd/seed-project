@@ -8,7 +8,7 @@ import os
 from typing import Tuple
 
 from torch.autograd import Variable
-from utils.file import print_dir
+from utils.file import *
 import warnings
 
 
@@ -52,7 +52,7 @@ def encoded(labels):
 def decode(labels):
     """
     将类别id恢复成灰度值
-    :param labels: shape=(h,w)
+    :param labels: shape=(-1)
     :return:
     """
     decoded_labels = torch.zeros_like(labels, dtype=torch.uint8)
@@ -70,6 +70,30 @@ def decode(labels):
     decoded_labels[labels == 6] = 224
     # 7
     decoded_labels[labels == 7] = 227
+    return decoded_labels
+
+
+def decode_rgb(labels):
+    """
+    将类别id恢复成彩色图
+    :param labels: shape=(n,h,w)
+    :return: shape=(n,h,w,3)
+    """
+    decoded_labels = torch.zeros(size=labels.shape+(3,), dtype=torch.uint8)
+    # 1
+    decoded_labels[labels == 1] = torch.tensor([204, 50, 150], dtype=torch.uint8)
+    # 2
+    decoded_labels[labels == 2] = torch.tensor([203, 200, 50], dtype=torch.uint8)
+    # 3
+    decoded_labels[labels == 3] = torch.tensor([217, 200, 0], dtype=torch.uint8)
+    # 4
+    decoded_labels[labels == 4] = torch.tensor([210, 100, 0], dtype=torch.uint8)
+    # 5
+    decoded_labels[labels == 5] = torch.tensor([214, 150, 0], dtype=torch.uint8)
+    # 6
+    decoded_labels[labels == 6] = torch.tensor([224, 0, 50], dtype=torch.uint8)
+    # 7
+    decoded_labels[labels == 7] = torch.tensor([227, 0, 150], dtype=torch.uint8)
     return decoded_labels
 
 
@@ -119,7 +143,8 @@ def recover_crop_resize(image, label, resize: Tuple, crop_offset: Tuple = (0, 0)
     # ５)INTER_LANCZOS4 - 基于8x8像素邻域的Lanczos插值
     roi_image = cv2.resize(image, out_size, interpolation=cv2.INTER_LINEAR)
     # roi_image = roi_image[crop_offset[0]:, crop_offset[1]:]  # crop
-    roi_image = np.pad(roi_image, ((crop_offset[0], 0), (crop_offset[1], 0), (0, 0)), 'constant', constant_values=(0, 0))
+    roi_image = np.pad(roi_image, ((crop_offset[0], 0), (crop_offset[1], 0), (0, 0)), 'constant',
+                       constant_values=(0, 0))
     if label is not None:
         roi_label = cv2.resize(label, out_size, interpolation=cv2.INTER_NEAREST)
         # roi_label = roi_label[crop_offset[0]:, crop_offset[1]:]
@@ -169,7 +194,8 @@ def data_generator(load_data, image_list, label_list, batch_size, resize: Tuple,
                     continue
                 if resize is not None and crop_offset is not None:
                     # crop & resize
-                    image, label = crop_resize(image, label, resize, crop_offset)  # image=shape(h,w,c), label=shape(h,w)
+                    image, label = crop_resize(image, label, resize,
+                                               crop_offset)  # image=shape(h,w,c), label=shape(h,w)
                 else:
                     print("The out_size and crop_offset is not set.")
                 # encode
@@ -186,7 +212,7 @@ def data_generator(load_data, image_list, label_list, batch_size, resize: Tuple,
                     # 维度改成(n,c,h,w)
                     out_images = out_images.transpose(0, 3, 1, 2)
                     # 归一化 -1 ~ 1
-                    out_images = out_images*2/255 - 1
+                    out_images = out_images * 2 / 255 - 1
                     yield torch.from_numpy(out_images), torch.from_numpy(out_labels).long()  # .requires_grad_(False)
                     # yield torch.from_numpy(out_images), transforms.ToTensor()(out_labels)
                     # yield torch.from_numpy(out_images), Variable(torch.from_numpy(out_labels).long(), requires_grad=False)
@@ -195,8 +221,83 @@ def data_generator(load_data, image_list, label_list, batch_size, resize: Tuple,
                     out_images_filename = []
 
 
+def _test_data_generator(image_list, batch_size, resize: Tuple,
+                         crop_offset: Tuple = (0, 0)):
+    """
+    生成数据
+    :param image_list: 图片路径列表, 必须是绝对路径
+    :param batch_size: 每批取多少张图片
+    :param resize: 输出的图片尺寸，(h,w)
+    :param crop_offset: 将原始图片截掉多少，(start_height, start_width)
+    :return: out_images=shape(batch_size,c,h,w),out_labels=shape(batch_size,h,w)
+    """
+    indices = np.arange(0, len(image_list))  # 索引
+    original_images = []
+    original_hw_size = []
+    out_images = []
+    out_images_filename = []
+
+    check_path = image_list[0]
+    if not os.path.isfile(check_path):
+        raise Exception("Check that the data set path `{}` is correct".format(check_path))
+    while True:
+        np.random.shuffle(indices)
+        for i in indices:
+            try:
+                image = cv2.imread(image_list[i])  # (h,w,c) BGR格式
+            except:  # 发生异常，执行这块代码
+                warnings.warn("The image file `{}` is no exists".format(image_list[i]))
+            else:  # 如果没有异常执行这块代码
+                if image is None:
+                    warnings.warn("The image file `{}` is no exists".format(image_list[i]))
+                    continue
+
+                # 记录原始图与size
+                original_images.append(image[:, :, ::-1])  # BGR转换成RGB
+                original_hw_size.append(image.shape[0:2])
+
+                if resize is not None and crop_offset is not None:
+                    # crop & resize
+                    image, label = crop_resize(image, None, resize, crop_offset)  # image=shape(h,w,c), label=shape(h,w)
+                else:
+                    print("The out_size and crop_offset is not set.")
+
+                out_images.append(image)
+                out_images_filename.append(image_list[i])
+                if len(out_images) == batch_size:
+                    out_images = np.array(out_images, dtype=np.float32)
+                    # BGR转换成RGB
+                    out_images = out_images[:, :, :, ::-1]
+                    # 维度改成(n,c,h,w)
+                    out_images = out_images.transpose(0, 3, 1, 2)
+                    # 归一化 -1 ~ 1
+                    out_images = out_images * 2 / 255 - 1
+                    yield torch.from_numpy(out_images), original_images, original_hw_size
+                    original_images = []
+                    original_hw_size = []
+                    out_images = []
+                    out_images_filename = []
+
+
+def test_data_generator(data_root_path, batch_size, resize: Tuple,
+                        crop_offset: Tuple = (0, 0)):
+    """
+    生成数据
+    :param data_root_path: 图片存放目录
+    :param batch_size: 每批取多少张图片
+    :param resize: 输出的图片尺寸，(h,w)
+    :param crop_offset: 将原始图片截掉多少，(start_height, start_width)
+    :return: out_images=shape(batch_size,c,h,w),out_labels=shape(batch_size,h,w)
+    """
+    image_list = get_all_filename(data_root_path)
+    print("The load data root path %s" % data_root_path)
+
+    return _test_data_generator(image_list, batch_size, resize, crop_offset), len(image_list)
+
+
 def read_image(image_path, resize, crop_offset):
-    image = cv2.imread(image_path)  # (h,w,c) BGR格式
+    ori_image = cv2.imread(image_path)  # (h,w,c) BGR格式
+    image = ori_image
     ori_size = image.shape[0:2]
     if resize is not None and crop_offset is not None:
         # crop & resize
@@ -215,7 +316,7 @@ def read_image(image_path, resize, crop_offset):
     out_images = out_images.transpose(0, 3, 1, 2)
     # 归一化 -1 ~ 1
     out_images = out_images * 2 / 255 - 1
-    return torch.from_numpy(out_images), ori_size
+    return torch.from_numpy(out_images), ori_size, ori_image[:, :, ::-1]
 
 
 def recover_image(image, resize, crop_offset):
@@ -233,6 +334,7 @@ if __name__ == "__main__":
     # encoded(lab)
 
     import pandas as pd
+
     df = pd.read_csv("../data_list/train.csv")
     generator = data_generator(r"D:\AI\project\data\baidu_lane_line\original",
                                np.array(df['image']),

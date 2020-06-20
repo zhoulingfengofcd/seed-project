@@ -224,7 +224,7 @@ def train_valid(in_channels, out_channels, net_name, lr,
 
         # 保存模型
         save_model(net, model_name)
-        print("The current epoch {} learning rate {}.".format(epoch, scheduler.get_last_lr()[0]))
+        print("The current epoch {} learning rate {}.".format(epoch, scheduler.get_lr()[0]))
         scheduler.step()  # 更新学习率
 
     print("This is the best model", best_net)
@@ -255,13 +255,78 @@ def test(in_channels, out_channels, net_name,
     # Load checkpoint weights
     net.load_state_dict(torch.load(weights_path))
     with torch.no_grad():
-        image, ori_size = read_image(image_path, resize, crop_offset)
+        image, ori_size, ori_image = read_image(image_path, resize, crop_offset)
         image = image.to(device)
         predicts = net(image)  # 推断
-        convert = torch.softmax(predicts, dim=1).argmax(dim=1)
-        decode_image = decode(convert).permute(1, 2, 0)
-        decode_image = decode_image.expand(decode_image.shape[0], decode_image.shape[1], 3).contiguous()
+        convert = torch.softmax(predicts, dim=1).argmax(dim=1)  # convert.shape=(n,h,w)
+        # decode_image = decode(convert).permute(1, 2, 0)
+        # decode_image = decode_image.expand(decode_image.shape[0], decode_image.shape[1], 3).contiguous()
+        # shape=(n,h,w,c)=(n,h,w,3)
+        decode_image = decode(convert).unsqueeze(dim=-1). \
+            expand(convert.shape[0], convert.shape[1], convert.shape[2], 3).contiguous()
         recover_img = recover_image(decode_image.numpy(), (ori_size[0] - crop_offset[0], ori_size[1] - crop_offset[1]),
                                     crop_offset)
-        plt.imshow(recover_img)
-        plt.show()
+
+        for index, img in enumerate(recover_img):
+            plt.subplot(1, 2, 1)
+            plt.imshow(img)
+            plt.subplot(1, 2, 2)
+            plt.imshow(ori_image)
+            plt.show()
+
+
+def test1(in_channels, out_channels, net_name,
+          weights_path, test_image_root, batch_size, resize=None, crop_offset=None, **kwargs):
+    """
+    测试网络
+    :param in_channels: 输入通道
+    :param out_channels: 输出通道
+    :param net_name: 网络名称
+    :param weights_path: 模型权重文件路径
+    :param test_image_root: 测试图片目录
+    :param batch_size: 批量大小
+    :param resize: 网络输入的图片尺寸
+    :param crop_offset: 剪切偏移量
+    :param kwargs:
+    :return:
+    """
+
+    device = torch.device("cpu" if torch.cuda.is_available() else "cpu")
+
+    # 网络
+    net = create_net(in_channels, out_channels, net_name, **kwargs)
+
+    net.eval()  # 不启用 BatchNormalization 和 Dropout, see https://pytorch.org/docs/stable/nn.html?highlight=module%20eval#torch.nn.Module.eval
+    net = net.to(device)
+
+    # Load checkpoint weights
+    net.load_state_dict(torch.load(weights_path))
+
+    generator, data_size = test_data_generator(test_image_root, batch_size, resize, crop_offset)
+    epoch_size = int(data_size / batch_size)  # 1个epoch包含的batch数目
+    with torch.no_grad():
+        for batch_index in range(1, epoch_size + 1):
+            images, original_images, original_hw_size = next(generator)
+
+            images = images.to(device)
+            predicts = net(images)  # 推断 shape=(n,c,h,w)
+            convert = torch.softmax(predicts, dim=1).argmax(dim=1)  # convert.shape=(n,h,w)
+
+            # shape=(n,h,w,c)=(n,h,w,3)
+            # decode_image = decode(convert).unsqueeze(dim=-1). \
+            #     expand(convert.shape[0], convert.shape[1], convert.shape[2], 3).contiguous()
+
+            # (n,h,w) => (n,h,w,3)
+            decode_image = decode_rgb(convert)
+
+            for index, original_image in enumerate(original_images):
+                original_size = original_hw_size[index]
+                result_image = recover_image(decode_image[index].numpy(),
+                                             (original_size[0] - crop_offset[0], original_size[1] - crop_offset[1]),
+                                             crop_offset)
+
+                plt.subplot(1, 2, 1)
+                plt.imshow(result_image)
+                plt.subplot(1, 2, 2)
+                plt.imshow(original_image)
+                plt.show()
