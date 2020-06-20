@@ -203,8 +203,6 @@ def train_valid(in_channels, out_channels, net_name, lr,
             loss = create_multi_loss(loss_type=LossType.ce_loss, predicts=predicts, labels=labels,
                                      num_classes=num_classes, loss_weights=loss_weights)
 
-            # miou = get_miou(predicts, labels, num_classes)
-
             print("loss {}/{}".format(batch_index, epoch_size), loss)
             epoch_loss += loss.item()
             loss.backward()  # 反向传播
@@ -212,19 +210,22 @@ def train_valid(in_channels, out_channels, net_name, lr,
             optimizer.zero_grad()  # 梯度清零
 
         print("The epoch {} end, epoch loss:{}, execution time:{}".format(epoch, epoch_loss,
-                                                                                   datetime.datetime.now() - start))
-        print("The current epoch {} learning rate {}.".format(epoch, scheduler.get_last_lr()[0]))
-        scheduler.step()  # 更新学习率
-        # 保存模型
-        model_name = f"ckpt_%d_%.2f.pth" % (epoch, epoch_loss)
-        save_model(net, model_name)
+                                                                          datetime.datetime.now() - start))
 
         # 验证
         miou = valid(net=net, csv_path=valid_csv_path, load_data=load_valid_data, batch_size=batch_size,
-                     resize=resize, crop_offset=crop_offset, num_classes=num_classes)
-        if miou.item() > best_net['miou']:
-            best_net['miou'] = miou.item()
+                     resize=resize, crop_offset=crop_offset, num_classes=num_classes).item()
+
+        model_name = f"ckpt_%d_%.2f_%.2f.pth" % (epoch, epoch_loss, miou)
+
+        if miou > best_net['miou']:
+            best_net['miou'] = miou
             best_net['name'] = model_name
+
+        # 保存模型
+        save_model(net, model_name)
+        print("The current epoch {} learning rate {}.".format(epoch, scheduler.get_last_lr()[0]))
+        scheduler.step()  # 更新学习率
 
     print("This is the best model", best_net)
 
