@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-
+from enum import Enum
 
 def _bbox_wh_iou(wh1, wh2):
     """
@@ -82,11 +82,11 @@ def get_miou(predicts: torch.Tensor, labels: torch.Tensor, num_classes):
 
     total_miou = 0.0
     for lt, lp in zip(labels, pred):  # 遍历每个样本
-        hist = _fast_hist(label_true=lt, label_pred=lp, n_class=num_classes).float()
-        iou = hist.diag()/(hist.sum(0) + hist.sum(1) - hist.diag())
+        hist = _fast_hist(label_true=lt, label_pred=lp, n_class=num_classes)
+        iou = hist.diag()/(hist.sum(0) + hist.sum(1) - hist.diag() + 1e-16)
         total_miou += iou.mean()
 
-    return total_miou
+    return total_miou / pred.shape[0]
 
 
 def create_iou_loss(predicts: torch.Tensor, labels: torch.Tensor, num_classes):
@@ -161,6 +161,23 @@ def create_ce_loss(predicts: torch.Tensor, labels: torch.Tensor, num_classes):
     # bce with dice
     ce_loss = F.cross_entropy(input=pred, target=labels.flatten())  # log(softmax(input)) -> NLLLoss(input, target)
     return ce_loss
+
+
+class LossType(Enum):
+    ce_loss = 'ce_loss'
+    dice_loss = 'dice_loss'
+    iou_loss = 'iou_loss'
+
+
+def create_multi_loss(loss_type: LossType, predicts: torch.Tensor, labels: torch.Tensor, num_classes, loss_weights=None):
+    if loss_type == LossType.ce_loss:
+        return create_ce_loss(predicts, labels, num_classes)
+    elif loss_type == LossType.dice_loss:
+        return create_dice_loss(predicts, labels, num_classes, loss_weights)
+    elif loss_type == LossType.iou_loss:
+        return create_iou_loss(predicts, labels, num_classes)
+    else:
+        raise Exception('The loss type is not defined')
 
 
 def test_dice_loss():

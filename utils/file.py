@@ -107,6 +107,7 @@ def copy_dataset(copy_to_local_root, source_data_path=None):
                 print("return data dir %s" % dirs[0])
                 return dirs[0]
             else:
+                print("return data dir %s" % local_data_root)
                 return local_data_root
     return _copy_dataset
 
