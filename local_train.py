@@ -24,6 +24,7 @@ if __name__ == '__main__':
                 epoch_begin=0, epoch_num=1,
                 num_classes=8,
                 save_model=save_model(local_root="./outputs/model"),
+                loss_type=LossType.dice_loss,
                 load_resnet_weight=load_weight(
                     pretrained_weights_path=r"C:\Users\zlf\.cache\torch\checkpoints\resnet101-5d3b4d8f.pth",
                     copy_to_local_root=None),

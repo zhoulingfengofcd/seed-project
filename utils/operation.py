@@ -139,7 +139,7 @@ def train_valid(in_channels, out_channels, net_name, lr,
                 epoch_begin, epoch_num,
                 num_classes,
                 save_model, load_state_dict_path=None,
-                loss_weights=None,
+                loss_type: LossType = LossType.ce_loss, loss_weights=None,
                 **kwargs):
     """
     训练网络模型
@@ -159,6 +159,7 @@ def train_valid(in_channels, out_channels, net_name, lr,
     :param num_classes: 类别数量
     :param save_model: 训练网络参数保存function
     :param load_state_dict_path: 网络预训练权重
+    :param loss_type: 损失函数
     :param loss_weights: 每个类别的权重, shape=(num_classes)
     :return:
     """
@@ -200,7 +201,7 @@ def train_valid(in_channels, out_channels, net_name, lr,
             if loss_weights is not None:
                 # dice_loss_weights = torch.Tensor([1, 2, 3, 4, 5, 6, 7, 8]).to(device)
                 loss_weights = torch.Tensor(loss_weights).to(device)
-            loss = create_multi_loss(loss_type=LossType.ce_loss, predicts=predicts, labels=labels,
+            loss = create_multi_loss(loss_type=loss_type, predicts=predicts, labels=labels,
                                      num_classes=num_classes, loss_weights=loss_weights)
 
             print("loss {}/{}".format(batch_index, epoch_size), loss)
