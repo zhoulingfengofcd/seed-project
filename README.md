@@ -23,24 +23,26 @@ model_arts_train.py 华为云训练脚本
 2、测试文件  
 然后就可以运行inference文件测试了  
 
-## 自动模型创建(待完善)
-在nets/model下定义了个类class Model，其根据一个字典定义，创建模型，其设计是将网络作为一个有向图来定义，参数有：  
-net：网络模型参数  
-layers：每层具体定义，并作为图的节点  
-adjacency：图节点的邻接表，网络的连接由邻接表指定  
-start_to_end：输入到输出的列表，支持多输入、多输出  
-layers内参数：请参考pytorch的对应方法参数  
+## 自动模型创建
+在nets/model下定义了个类class Model，其根据一个字典定义，创建模型，其设计是将网络作为一个有向图来定义，参数配置：  
+{  
+&nbsp;&nbsp;&nbsp;&nbsp;net：网络模型参数    
+&nbsp;&nbsp;&nbsp;&nbsp;layers：每层具体定义，并作为图的节点    
+&nbsp;&nbsp;&nbsp;&nbsp;adjacency：图节点的邻接表，网络的连接由邻接表指定    
+&nbsp;&nbsp;&nbsp;&nbsp;start_to_end：输入到输出的列表，支持多输入、多输出  
+}  
+备注：layers内参数：请参考pytorch的对应方法参数  
 
-即你只需定义一个有向图，Model即可根据该配置自动创建与运行该网络  
+即你只需定义一个有向图，Model即可根据该配置自动创建与运行  
   
-示例：
+支持的所有配置参数：
 ```
 {
     "net": {
-        "in_channels": 3  # 必须
+        "in_channels": 3  # 必须, 网络的输入数据通道数
     },
     "layers": {
-        "0": {
+        "con2d": {  # 节点(层)名称, 必须唯一
             "type": "Conv2d",  # 必须
             "out_channels": 3,  # 必须
             "kernel_size": 3,  # 必须
@@ -51,7 +53,7 @@ layers内参数：请参考pytorch的对应方法参数
             "bias": True,  # 默认
             "padding_mode": "zeros"  # 默认
         },
-        "1": {
+        "maxpool2d": {
             "type": "MaxPool2d",  # 必须
             "kernel_size": 3,  # 必须
             "stride": 3,  # 默认=kernel_size
@@ -60,73 +62,53 @@ layers内参数：请参考pytorch的对应方法参数
             "return_indices": False,  # 默认
             "ceil_mode": False  # 默认
         },
-        "2": {
+        "interpolate": {
             "type": "interpolate",  # 必须
             # "size": (46, 46),  # size与scale_factor二选一, 输出image大小
             "scale_factor": 2,  # size与scale_factor二选一, 指定输出为输入的多少倍数
-            "mode": "nearest",  # 默认
+            "mode": "nearest",  # 默认, 支持 'nearest' | 'linear' | 'bilinear' | 'bicubic' | 'trilinear' | 'area'. Default: 'nearest'
             "align_corners": None,  # 默认
             "recompute_scale_factor": None  # 默认
         },
-        "3": {
+        "concat": {
             "type": "concat"  # 必须
         },
-        "4": {
+        "shortcut": {
             "type": "shortcut"  # 必须
         },
-        "5": {
-            "type": "MaxPool2d",  # 必须
-            "kernel_size": 3,  # 必须
-            "stride": 3,  # 默认=kernel_size
-            "padding": 0,  # 默认
-            "dilation": 1,  # 默认
-            "return_indices": False,  # 默认
-            "ceil_mode": False  # 默认
-        },
-        "6": {
-            "type": "interpolate",  # 必须
-            # "size": (46, 46),  # size与scale_factor二选一, 输出image大小
-            "scale_factor": 2,  # size与scale_factor二选一, 指定输出为输入的多少倍数
-            "mode": "nearest",  # 默认
-            "align_corners": None,  # 默认
-            "recompute_scale_factor": None  # 默认
-        },
-        "7": {
-            "type": "concat"  # 必须
-        },
-        "8": {
-            "type": "shortcut"  # 必须
-        },
-        "10": {
+        "relu": {
             "type": "ReLU",  # 必须
             "inplace": False  # 默认
         },
-        "11": {
-            "type": "BatchNorm2d",
-            # "num_features": 1,  # 默认=in_channels
+        "batchnorm2d": {
+            "type": "BatchNorm2d",  # 必须
+            "num_features": 10,  # 默认, 为本层输入的channels总和
             "eps": 1e-5,  # 默认
             "momentum": 0.1,  # 默认
             "affine": True,  # 默认
             "track_running_stats": True  # 默认
         },
-        "9": {
-            "type": "shortcut"  # 必须
+        "adaptiveavgpool2d": {
+            "type": "AdaptiveAvgPool2d",  # 必须
+            "output_size": (5,7)  # 必须
+        },
+        "linear": {
+            "type": "Linear",  # 必须
+            "in_features": 96,  # 必须
+            "out_features":  10,  # 必须
+            "bias": True  # 默认
         }
     },
     "adjacency": {
-        "0": ["1", "5"],
-        "1": ["2"],
-        "2": ["3"],
-        "3": ["4"],
-
-        "5": ["6"],
-        "6": ["7"],
-        "7": ["8"],
-        "8": ["10"],
-        "10": ["11"],
-        "11": ["9"],
-        "4": ["9"]
+        "con2d": ["maxpool2d", "concat", "shortcut"],  # 其含义：con2d —> maxpool2d, con2d —> concat, con2d —> shortcut
+        "maxpool2d": ["interpolate"],
+        "interpolate": ["concat"],
+        "concat": ["shortcut"],
+        "shortcut": ["relu"],
+        "relu": ["batchnorm2d"],
+        "batchnorm2d": ["adaptiveavgpool2d"],
+        "adaptiveavgpool2d": ["linear"]   
     },
-    "start_to_end": [("0", "9")]
+    "start_to_end": [("con2d", "linear")]  # 网络输入节点con2d, 输出节点linear
 }
 ```

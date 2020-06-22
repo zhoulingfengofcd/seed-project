@@ -2,11 +2,6 @@ from utils.operation import *
 from utils.file import *
 import argparse
 
-try:
-    import moxing as mox
-except:
-    print('not use moxing')
-
 if __name__ == '__main__':
     print("start model arts train.")
     parser = argparse.ArgumentParser()
@@ -42,4 +37,3 @@ if __name__ == '__main__':
                     pretrained_weights_path='s3://zlf-rubbish-data/weights/resnet101-5d3b4d8f.pth',
                     copy_to_local_root='/cache/weight'),
                 )
-    # test_dice_loss()

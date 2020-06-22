@@ -4,11 +4,6 @@ import pandas as pd
 from utils.loss import *
 import datetime
 
-try:
-    import moxing as mox
-except:
-    print('not use moxing')
-
 
 def train(in_channels, out_channels, net_name, lr, csv_path, load_data,
           batch_size, resize, crop_offset,
