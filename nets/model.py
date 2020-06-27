@@ -6,13 +6,11 @@ from typing import Tuple
 import torch.nn as nn
 import torch.nn.functional as F
 from collections import OrderedDict
-import torchvision
-from utils import visual
-from utils.graph import search
+from utils.graph import *
 import torch
 import warnings
 from enum import Enum
-import json
+from utils.file import read_json
 
 
 class LayerType(Enum):
@@ -25,6 +23,7 @@ class LayerType(Enum):
     BatchNorm2d = "BatchNorm2d"
     AdaptiveAvgPool2d = "AdaptiveAvgPool2d"
     Linear = "Linear"
+    LeakyReLU = "LeakyReLU"
 
 
 def create_layer(layer_def: dict, in_channel_list: list):
@@ -37,7 +36,7 @@ def create_layer(layer_def: dict, in_channel_list: list):
     in_channels = sum(in_channel_list)
 
     # 二维卷积层
-    if layer_def["type"] == LayerType.Conv2d.value:
+    if layer_type == LayerType.Conv2d.value:
         # 卷积层，无需定义所有参数，只需定义out_channels、kernel_size，其他参数都有默认值
         if 'out_channels' not in layer_keys:
             raise Exception("The out_channels parameter can not be None")
@@ -56,7 +55,7 @@ def create_layer(layer_def: dict, in_channel_list: list):
             bias=True if 'bias' not in layer_keys else layer_def['bias'],
             padding_mode='zeros' if 'padding_mode' not in layer_keys else layer_def['padding_mode']
         )
-    elif layer_def["type"] == LayerType.MaxPool2d.value:
+    elif layer_type == LayerType.MaxPool2d.value:
         if 'kernel_size' not in layer_keys:
             raise Exception("The kernel_size parameter can not be None")
         out_channels = in_channels
@@ -68,9 +67,11 @@ def create_layer(layer_def: dict, in_channel_list: list):
             return_indices=False if 'return_indices' not in layer_keys else layer_def['return_indices'],
             ceil_mode=False if 'ceil_mode' not in layer_keys else layer_def['ceil_mode']
         )
-    elif layer_def["type"] == LayerType.interpolate.value:
+    elif layer_type == LayerType.interpolate.value:
         if "size" not in layer_keys and "scale_factor" not in layer_keys:
             raise Exception("The size and scale_factor parameter cannot be empty at the same time")
+        elif "size" in layer_keys and "scale_factor" in layer_keys:
+            raise Exception("only one of size or scale_factor should be defined")
         out_channels = in_channels
         layer_data = Interpolate(
             size=None if "size" not in layer_keys else layer_def["size"],
@@ -80,16 +81,16 @@ def create_layer(layer_def: dict, in_channel_list: list):
             recompute_scale_factor=None if "recompute_scale_factor" not in layer_keys else layer_def[
                 "recompute_scale_factor"]
         )
-    elif layer_def["type"] == LayerType.concat.value:
+    elif layer_type == LayerType.concat.value:
         out_channels = in_channels
         layer_data = EmptyLayer()  # 在执行时，再合并
-    elif layer_def["type"] == LayerType.shortcut.value:
+    elif layer_type == LayerType.shortcut.value:
         out_channels = in_channel_list[0]
         layer_data = EmptyLayer()  # 在执行时，再相加
-    elif layer_def["type"] == LayerType.ReLU.value:
+    elif layer_type == LayerType.ReLU.value:
         out_channels = in_channels
         layer_data = nn.ReLU(inplace=False if 'inplace' not in layer_keys else layer_def['inplace'])
-    elif layer_def["type"] == LayerType.BatchNorm2d.value:
+    elif layer_type == LayerType.BatchNorm2d.value:
         out_channels = in_channels
         layer_data = nn.BatchNorm2d(
             num_features=in_channels if 'num_features' not in layer_keys else layer_def['num_features'],
@@ -98,7 +99,7 @@ def create_layer(layer_def: dict, in_channel_list: list):
             affine=True if 'affine' not in layer_keys else layer_def['affine'],
             track_running_stats=True if 'track_running_stats' not in layer_keys else layer_def['track_running_stats']
         )
-    elif layer_def["type"] == LayerType.AdaptiveAvgPool2d.value:
+    elif layer_type == LayerType.AdaptiveAvgPool2d.value:
         if 'output_size' not in layer_keys:
             raise Exception("The output_size parameter can not be None")
         out_channels = in_channels
@@ -113,6 +114,12 @@ def create_layer(layer_def: dict, in_channel_list: list):
             in_features=layer_def["in_features"],
             out_features=layer_def["out_features"],
             bias=True if 'bias' not in layer_keys else layer_def['bias']
+        )
+    elif layer_type == LayerType.LeakyReLU.value:
+        out_channels = in_channels
+        layer_data = nn.LeakyReLU(
+            negative_slope=1e-2 if 'negative_slope' not in layer_keys else layer_def['negative_slope'],
+            inplace=False if 'inplace' not in layer_keys else layer_def['inplace']
         )
     else:
         raise Exception("The type `{}` undefined!".format(layer_def["type"]))
@@ -148,15 +155,19 @@ class EmptyLayer(nn.Module):
         super(EmptyLayer, self).__init__()
 
 
-def create_model(net: dict, layers: dict, adjacency: dict, start_to_end: list):
+def create_model(net: dict, layers: dict, adjacency: dict, start_and_end: dict):
     if adjacency is None or len(adjacency.keys()) == 0:
         raise Exception("The adjacency parameter cannot be None")
-    if start_to_end is None or len(start_to_end) == 0:
-        raise Exception("The start_to_end parameter cannot be None")
+    if start_and_end is None or 'start' not in start_and_end.keys() or 'end' not in start_and_end.keys() \
+            or len(start_and_end['start']) == 0 or len(start_and_end['end']) == 0:
+        raise Exception("The start_and_end parameter cannot be None")
     if net is None or len(net.keys()) == 0:
-        raise Exception("The start_to_end parameter cannot be None")
+        raise Exception("The start_and_end parameter cannot be None")
     if "in_channels" not in net.keys():
         raise Exception("You need to define the `in_channels` parameter in net dictionary")
+
+    output_node = start_and_end['end']
+    start_node = start_and_end['start']
 
     # 邻接表转逆邻接表
     inverse_adjacency = dict()
@@ -173,52 +184,52 @@ def create_model(net: dict, layers: dict, adjacency: dict, start_to_end: list):
 
     layer_dict = OrderedDict()
     out_channels_dict = dict()
-    output_node = []
-    start_node = []
-    for (start, end) in start_to_end:
-        path_list = search(graph=adjacency, start=start, end=end)
-        while path_list:  # 遍历所有路径
-            path = path_list.pop(0)
-            for index, node in enumerate(path):  # 遍历所有节点
-                if index == 0 and node != start:
-                    raise Exception("The search path Exception!")
 
-                if node != start and [False for i in inverse_adjacency[node] if i not in layer_dict.keys()]:
-                    # 路径依赖的节点，如果有节点还未创建，先结束本路径，待依赖节点创建后，再创建
-                    path_list.append(path)
-                    break
-                if node in layer_dict.keys():
-                    continue  # 该节点已经创建，则不再创建
+    path_list = search_all_path1(start_node, output_node, adjacency, inverse_adjacency)
+    if path_list is None or len(path_list) == 0:
+        raise Exception("The start `{}` to end `{}` node path does not exist".format(start_node, output_node))
+
+    for index, node in enumerate(path_list):  # 遍历所有节点
+        if index == 0 and node not in start_node:
+            raise Exception("The search path Exception!")
+
+        if node not in start_node and [False for i in inverse_adjacency[node] if i not in layer_dict.keys()]:
+            # 路径依赖的节点，如果有节点还未创建，抛出异常
+            raise Exception("Incorrect node calculation sequence")
+        if node in layer_dict.keys():
+            raise Exception("Node to repeat")  # 该节点已经创建
+        else:
+            try:
+                if node in start_node:
+                    layer_define, out_channels, layer_type = create_layer(layers[node], [net["in_channels"]])
                 else:
-                    if node == start:
-                        layer_define, out_channels, layer_type = create_layer(layers[node], [net["in_channels"]])
-                    else:
-                        layer_define, out_channels, layer_type = create_layer(layers[node],
-                                                                              [out_channels_dict[i] for i in
-                                                                               inverse_adjacency[node]])
-                    # 判断该节点是否被依赖
-                    is_depended = False
-                    if node in adjacency.keys():
-                        # 指向多个节点
-                        if len(adjacency[node]) > 1:
+                    layer_define, out_channels, layer_type = create_layer(layers[node],
+                                                                          [out_channels_dict[i] for i in
+                                                                           inverse_adjacency[node]])
+            except BaseException as e:
+                raise Exception("node `{}`".format(node) + str(e.args))
+
+            # 判断该节点是否被依赖
+            is_depended = False
+            if node in adjacency.keys():
+                # 指向多个节点
+                if len(adjacency[node]) > 1:
+                    is_depended = True
+                # 指向的节点，依赖多个节点
+                for adjacency_node in adjacency[node]:
+                    if adjacency_node in inverse_adjacency.keys():
+                        if len(inverse_adjacency[adjacency_node]) > 1:
                             is_depended = True
-                        # 指向的节点，依赖多个节点
-                        for adjacency_node in adjacency[node]:
-                            if adjacency_node in inverse_adjacency.keys():
-                                if len(inverse_adjacency[adjacency_node]) > 1:
-                                    is_depended = True
 
-                    layer_dict[node] = ModelLayer(define=layer_define, layer_type=layer_type,
-                                                  inverse_adjacency=None if node not in inverse_adjacency.keys() else
-                                                  inverse_adjacency[node],
-                                                  adjacency=None if node not in adjacency.keys() else adjacency[node],
-                                                  is_depended=is_depended
-                                                  )
+            layer_dict[node] = ModelLayer(define=layer_define, layer_type=layer_type,
+                                          inverse_adjacency=None if node not in inverse_adjacency.keys() else
+                                          inverse_adjacency[node],
+                                          adjacency=None if node not in adjacency.keys() else adjacency[node],
+                                          is_depended=is_depended
+                                          )
 
-                    out_channels_dict[node] = out_channels
+            out_channels_dict[node] = out_channels
 
-        start_node.append(start)
-        output_node.append(end)
     return layer_dict, start_node, output_node
 
 
@@ -257,15 +268,15 @@ class Model(nn.Module):
     def __init__(self, model_defs: dict):
         super(Model, self).__init__()
         if "net" not in model_defs.keys() or "layers" not in model_defs.keys() or "adjacency" not in model_defs.keys() \
-                or "start_to_end" not in model_defs.keys():
-            raise Exception("The model_def need to define the `net` `layers` `adjacency` `start_to_end` parameter")
+                or "start_and_end" not in model_defs.keys():
+            raise Exception("The model_def need to define the `net` `layers` `adjacency` `start_and_end` parameter")
 
         net = model_defs["net"]
         layers = model_defs["layers"]
         adjacency = model_defs["adjacency"]
-        start_to_end = model_defs["start_to_end"]
+        start_and_end = model_defs["start_and_end"]
         layer_dict, self.start_node, self.output_node = create_model(
-            net=net, layers=layers, adjacency=adjacency, start_to_end=start_to_end
+            net=net, layers=layers, adjacency=adjacency, start_and_end=start_and_end
         )
         self.model_keys = [k for k, v in layer_dict.items()]
         self.model_dict = nn.Sequential(
@@ -277,57 +288,62 @@ class Model(nn.Module):
         output_cache = dict()
         last_layer_output = ()
         for key, model_layer in zip(self.model_keys, self.model_dict):
-            layer: ModelLayer = model_layer
-            layer_type = layer.type
-            layer_define = layer.define
-            layer_inverse_adjacency = layer.inverse_adjacency
-            layer_adjacency = layer.adjacency
-            layer_is_depended = layer.is_depended
-            if layer_type == LayerType.Conv2d.value:
-                if key in self.start_node:
-                    result = layer_define(x)
-                else:
-                    result = layer_define(get_depend(layer_inverse_adjacency, output_cache, last_layer_output))
-            elif key in self.start_node:  # 网络开始的层，不能为后边的层
-                raise Exception("The start node is not convolution")
-            elif layer_type == LayerType.MaxPool2d.value:
-                result = layer_define(get_depend(layer_inverse_adjacency, output_cache, last_layer_output))
-            elif layer_type == LayerType.interpolate.value:
-                result = layer_define(get_depend(layer_inverse_adjacency, output_cache, last_layer_output))
-            elif layer_type == LayerType.concat.value:
-                depend = get_depend(layer_inverse_adjacency, output_cache, last_layer_output)
-                if isinstance(depend, torch.Tensor):
-                    warnings.warn("This concat is only one edges")
-                    result = torch.cat([depend], 1)
-                else:
-                    result = torch.cat(depend, 1)
-            elif layer_type == LayerType.shortcut.value:
-                depend = get_depend(layer_inverse_adjacency, output_cache, last_layer_output)
-                if isinstance(depend, torch.Tensor):
-                    warnings.warn("This shortcut is only one edges")
-                    result = depend
-                else:
-                    for i in range(1, len(depend)):
-                        result = depend[i - 1] + depend[i]
-            elif layer_type == LayerType.ReLU.value:
-                result = layer_define(get_depend(layer_inverse_adjacency, output_cache, last_layer_output))
-            elif layer_type == LayerType.BatchNorm2d.value:
-                result = layer_define(get_depend(layer_inverse_adjacency, output_cache, last_layer_output))
-            elif layer_type == LayerType.AdaptiveAvgPool2d.value:
-                result = layer_define(get_depend(layer_inverse_adjacency, output_cache, last_layer_output))
-            elif layer_type == LayerType.Linear.value:
-                result = layer_define(get_depend(layer_inverse_adjacency, output_cache, last_layer_output))
-            else:
-                raise Exception("The type `{}` undefined!".format(layer_type))
-            # 记录上一层
-            last_layer_output = (key, result)
-            # 记录依赖分支的层
-            if layer_is_depended:
-                output_cache[key] = result
-            # 记录输出层
-            if key in self.output_node:
-                model_outputs[self.output_node.index(key)] = result
+            try:
+                layer: ModelLayer = model_layer
+                layer_type = layer.type
+                layer_define = layer.define
+                layer_inverse_adjacency = layer.inverse_adjacency
+                layer_adjacency = layer.adjacency
+                layer_is_depended = layer.is_depended
 
+                if layer_type == LayerType.Conv2d.value:
+                    if key in self.start_node:
+                        result = layer_define(x)
+                    else:
+                        result = layer_define(get_depend(layer_inverse_adjacency, output_cache, last_layer_output))
+                elif key in self.start_node:  # 网络开始的层，不能为后边的层
+                    raise Exception("The start node is not convolution")
+                elif layer_type == LayerType.MaxPool2d.value:
+                    result = layer_define(get_depend(layer_inverse_adjacency, output_cache, last_layer_output))
+                elif layer_type == LayerType.interpolate.value:
+                    result = layer_define(get_depend(layer_inverse_adjacency, output_cache, last_layer_output))
+                elif layer_type == LayerType.concat.value:
+                    depend = get_depend(layer_inverse_adjacency, output_cache, last_layer_output)
+                    if isinstance(depend, torch.Tensor):
+                        warnings.warn("This concat is only one edges")
+                        result = torch.cat([depend], 1)
+                    else:
+                        result = torch.cat(depend, 1)
+                elif layer_type == LayerType.shortcut.value:
+                    depend = get_depend(layer_inverse_adjacency, output_cache, last_layer_output)
+                    if isinstance(depend, torch.Tensor):
+                        warnings.warn("This shortcut is only one edges")
+                        result = depend
+                    else:
+                        for i in range(1, len(depend)):
+                            result = depend[i - 1] + depend[i]
+                elif layer_type == LayerType.ReLU.value:
+                    result = layer_define(get_depend(layer_inverse_adjacency, output_cache, last_layer_output))
+                elif layer_type == LayerType.BatchNorm2d.value:
+                    result = layer_define(get_depend(layer_inverse_adjacency, output_cache, last_layer_output))
+                elif layer_type == LayerType.AdaptiveAvgPool2d.value:
+                    result = layer_define(get_depend(layer_inverse_adjacency, output_cache, last_layer_output))
+                elif layer_type == LayerType.Linear.value:
+                    result = layer_define(get_depend(layer_inverse_adjacency, output_cache, last_layer_output))
+                elif layer_type == LayerType.LeakyReLU.value:
+                    result = layer_define(get_depend(layer_inverse_adjacency, output_cache, last_layer_output))
+                else:
+                    raise Exception("The type `{}` undefined!".format(layer_type))
+                # 记录上一层
+                last_layer_output = (key, result)
+                # 记录依赖分支的层
+                if layer_is_depended:
+                    output_cache[key] = result
+                # 记录输出层
+                if key in self.output_node:
+                    model_outputs[self.output_node.index(key)] = result
+            except BaseException as e:
+                raise Exception("node `{}`".format(key) + str(e.args))
         return model_outputs
 
 
@@ -507,7 +523,7 @@ def get_data_cache(model, input):
     return model_output, adjacency, start, end
 
 
-def test_create_model():
+def _test_create_model():
     model_def = {
         "net": {
             "in_channels": 3  # 必须
@@ -600,7 +616,7 @@ def test_create_model():
             "11": ["9"],
             "4": ["9"]
         },
-        "start_to_end": [("0", "9")]
+        "start_and_end": [("0", "9")]
     }
 
     model = Model(model_defs=model_def)
@@ -610,25 +626,123 @@ def test_create_model():
     print(outputs[0].shape)
 
 
+def load_model_from_json(path, in_channels):
+    json = read_json(path)
+    model_defs = {
+        "net": {
+            "in_channels": in_channels
+        },
+        "layers": {},
+        "adjacency": {},
+        "start_and_end": {}
+    }
+
+    # 遍历节点
+    if 'nodes' not in json:
+        raise Exception("No `nodes` are defined in the configuration")
+    nodes = json['nodes']
+    for node in nodes:
+        # 节点类型
+        if 'data' not in node or 'layer' not in node['data'] or 'type' not in node['data']['layer']:
+            raise Exception("Node `type` must be defined")
+        layer_type = node['data']['layer']['type']
+        layer_def = {
+            "type": layer_type
+        }
+        # 节点id
+        if 'id' not in node:
+            raise Exception("The node has no `id` defined")
+        node_id = node['id']
+        # 开始、结束节点
+        if 'start_or_end' in node['data']['layer']:
+            if node['data']['layer']['start_or_end'] == 'start':
+                if 'start' in model_defs['start_and_end'].keys():
+                    model_defs['start_and_end']['start'].append(node_id)
+                else:
+                    model_defs['start_and_end']['start'] = [node_id]
+            elif node['data']['layer']['start_or_end'] == 'end':
+                if 'end' in model_defs['start_and_end'].keys():
+                    model_defs['start_and_end']['end'].append(node_id)
+                else:
+                    model_defs['start_and_end']['end'] = [node_id]
+        # 节点参数
+        if 'parameters' in node['data']:
+            parameters = node['data']['parameters']
+            for parameter in parameters:
+                if 'label' not in parameter or 'type' not in parameter:
+                    raise Exception("Parameter `label` or `type` must be defined")
+                key = parameter['label']
+                parameter_type = parameter['type']
+
+                if 'value' in parameter and parameter['value'] is not None:
+                    if parameter_type == 'TupleNumber':
+                        layer_def[key] = tuple(parameter['value'])
+                    else:
+                        layer_def[key] = parameter['value']
+                elif 'options' in parameter and 'initialValue' in parameter['options'] and parameter['options']['initialValue'] is not None:
+                    if parameter_type == 'TupleNumber':
+                        layer_def[key] = tuple(parameter['options']['initialValue'])
+                    else:
+                        layer_def[key] = parameter['options']['initialValue']
+
+        model_defs['layers'][node_id] = layer_def
+
+    if 'start' not in model_defs['start_and_end'].keys() or 'end' not in model_defs['start_and_end'].keys():
+        raise Exception("No `start` or `end` node are defined in the configuration")
+
+    # 遍历连线
+    if 'lines' not in json:
+        raise Exception("No `lines` are defined in the configuration")
+    lines = json['lines']
+    for line in lines:
+        if 'id' not in line or 'from' not in line or 'id' not in line['from'] or 'to' not in line or 'id' not in line['to']:
+            raise Exception("The node has no `id` or `from` or `to` defined")
+        if line['from']['id'] not in model_defs['layers'].keys() or line['to']['id'] not in model_defs['layers'].keys():
+            raise Exception("The node has no `id` defined in the nodes")
+
+        if line['from']['id'] in model_defs['adjacency'].keys():
+            model_defs['adjacency'][line['from']['id']].append(line['to']['id'])
+        else:
+            model_defs['adjacency'][line['from']['id']] = [line['to']['id']]
+
+    model = Model(model_defs=model_defs)
+    return model
+
+
 if __name__ == '__main__':
-    # test_create_model()
-    model = torchvision.models.resnet101()
-    layers: dict = layer_convert_dict(model)
+    # _test_create_model()
+
+    # model = torchvision.models.resnet101()
+    # layers: dict = layer_convert_dict(model)
+    # print(model)
+    # print(layers)
+    #
+    # input = torch.randn(1, 3, 224, 224).requires_grad_(True)
+    #
+    # output, adjacency, start, end = get_data_cache(model, input)
+    #
+    # print(start, end)
+    # print(adjacency)
+    # graph = "digraph G{\n"
+    # for key1 in adjacency.keys():
+    #     for key2 in adjacency[key1]:
+    #         graph += key1 + "->" + key2 + ";\n"
+    # graph += "}\n"
+    # print(graph)
+
+    model = load_model_from_json("./yolo/yolov3.json", 3)
     print(model)
-    print(layers)
+    input = torch.rand(1, 3, 224, 224)
+    outputs = model(input)
+    print(outputs[0].shape)
+    # from utils.file import save_model
+    # save_model(r'D:\AI\project\data\weights')(model, "test1")
 
-    input = torch.randn(1, 3, 224, 224).requires_grad_(True)
+    # pth = r'D:\AI\project\data\weights\test1'
+    # sta_dic = torch.load(pth)
+    # print('.pth type:', type(sta_dic))
+    # print('.pth len:', len(sta_dic))
+    # print('--------------------------')
+    # for k in sta_dic.keys():
+    #     print(k, type(sta_dic[k]), sta_dic[k].shape)
 
-    output, adjacency, start, end = get_data_cache(model, input)
-
-    print(start, end)
-    print(adjacency)
-    graph = "digraph G{\n"
-    for key1 in adjacency.keys():
-        for key2 in adjacency[key1]:
-            graph += key1 + "->" + key2 + ";\n"
-    graph += "}\n"
-    print(graph)
-    # torch.Tensor
-    # g = visual.make_dot(output, params=dict(list(model.named_parameters()) + [('x', input)]))
-    # g.view()

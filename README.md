@@ -13,7 +13,7 @@ local_train.py 本地训练脚本
 model_arts_train.py 华为云训练脚本  
 ```
 
-## 训练命令
+## 训练
 1、需要准备数据集  
 2、准备预训练权重文件，当然这不是必须的，如果不传该路径，会自动下载.pth文件  
 然后就可以直接运行local_train或model_arts_train了  
@@ -29,7 +29,7 @@ model_arts_train.py 华为云训练脚本
 &nbsp;&nbsp;&nbsp;&nbsp;net：网络模型参数    
 &nbsp;&nbsp;&nbsp;&nbsp;layers：每层具体定义，并作为图的节点    
 &nbsp;&nbsp;&nbsp;&nbsp;adjacency：图节点的邻接表，网络的连接由邻接表指定    
-&nbsp;&nbsp;&nbsp;&nbsp;start_to_end：输入到输出的列表，支持多输入、多输出  
+&nbsp;&nbsp;&nbsp;&nbsp;start_and_end：输入、输出列表，支持多输入、多输出  
 }  
 备注：layers内参数：请参考pytorch的对应方法参数  
 
@@ -97,7 +97,12 @@ model_arts_train.py 华为云训练脚本
             "in_features": 96,  # 必须
             "out_features":  10,  # 必须
             "bias": True  # 默认
-        }
+        },
+        "leakyrelu": {
+            "type": "LeakyReLU",  # 必须
+            "negative_slope": 1e-2,  # 默认
+            "inplace": False  # 默认
+        },
     },
     "adjacency": {
         "con2d": ["maxpool2d", "concat", "shortcut"],  # 其含义：con2d —> maxpool2d, con2d —> concat, con2d —> shortcut
@@ -107,8 +112,12 @@ model_arts_train.py 华为云训练脚本
         "shortcut": ["relu"],
         "relu": ["batchnorm2d"],
         "batchnorm2d": ["adaptiveavgpool2d"],
-        "adaptiveavgpool2d": ["linear"]   
+        "adaptiveavgpool2d": ["linear"],
+        "linear": ["leakyrelu"]   
     },
-    "start_to_end": [("con2d", "linear")]  # 网络输入节点con2d, 输出节点linear
+    "start_and_end": {  # 网络输入节点con2d, 输出节点leakyrelu
+        "start": [con2d],
+        "end": [leakyrelu]
+    }
 }
 ```

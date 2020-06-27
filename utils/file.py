@@ -2,6 +2,7 @@ import os
 import shutil
 import torch
 import zipfile
+import json
 try:
     import moxing as mox
     mox.file.shift('os', 'mox')
@@ -140,6 +141,12 @@ def save_model(local_root, copy_root=None):
         else:
             print("only save model in %s" % ckpt_name)
     return _save_model
+
+
+def read_json(path):
+    # 读取json文件内容,返回字典格式
+    with open(path, 'r', encoding='utf8')as fp:
+        return json.load(fp)
 
 
 if __name__ == '__main__':
