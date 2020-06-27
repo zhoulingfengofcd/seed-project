@@ -318,7 +318,7 @@ class Model(nn.Module):
                 elif layer_type == LayerType.shortcut.value:
                     depend = get_depend(layer_inverse_adjacency, output_cache, last_layer_output)
                     if isinstance(depend, torch.Tensor):
-                        warnings.warn("This shortcut is only one edges")
+                        warnings.warn("This shortcut `{}` is only one edges".format(key))
                         result = depend
                     else:
                         for i in range(1, len(depend)):
@@ -348,7 +348,7 @@ class Model(nn.Module):
         return model_outputs
 
 
-def load_model_from_json(path, in_channels):
+def load_model_from_json1(path, in_channels):
     json = read_json(path)
     model_defs = {
         "net": {
@@ -433,6 +433,98 @@ def load_model_from_json(path, in_channels):
     return model
 
 
+def load_model_from_json2(path, in_channels):
+    json = read_json(path)
+    model_defs = {
+        "net": {
+            "in_channels": in_channels
+        },
+        "layers": {},
+        "adjacency": {},
+        "start_and_end": {}
+    }
+
+    # 遍历节点
+    if 'pens' not in json:
+        raise Exception("No `pens` are defined in the configuration")
+    pens = json['pens']
+    for node_or_line in pens:
+        if 'type' not in node_or_line:
+            raise Exception("Each entry in the pens must define the Type parameter")
+        pens_type = node_or_line['type']
+        if pens_type == 0:  # 节点
+            node = node_or_line
+            # 节点类型
+            if 'data' not in node or 'layer' not in node['data'] or 'type' not in node['data']['layer']:
+                raise Exception("Node `type` must be defined")
+            layer_type = node['data']['layer']['type']
+            layer_def = {
+                "type": layer_type
+            }
+            # 节点id
+            if 'id' not in node:
+                raise Exception("The node has no `id` defined")
+            node_id = node['id']
+            # 开始、结束节点
+            if 'start_or_end' in node['data']['layer']:
+                if node['data']['layer']['start_or_end'] == 'start':
+                    if 'start' in model_defs['start_and_end'].keys():
+                        model_defs['start_and_end']['start'].append(node_id)
+                    else:
+                        model_defs['start_and_end']['start'] = [node_id]
+                elif node['data']['layer']['start_or_end'] == 'end':
+                    if 'end' in model_defs['start_and_end'].keys():
+                        model_defs['start_and_end']['end'].append(node_id)
+                    else:
+                        model_defs['start_and_end']['end'] = [node_id]
+            # 节点参数
+            if 'parameters' in node['data']:
+                parameters = node['data']['parameters']
+                for parameter in parameters:
+                    if 'label' not in parameter or 'type' not in parameter:
+                        raise Exception("Parameter `label` or `type` must be defined")
+                    key = parameter['label']
+                    parameter_type = parameter['type']
+
+                    if 'value' in parameter and parameter['value'] is not None:
+                        if parameter_type == 'TupleNumber':
+                            layer_def[key] = tuple(parameter['value'])
+                        else:
+                            layer_def[key] = parameter['value']
+                    elif 'options' in parameter and 'initialValue' in parameter['options'] and parameter['options']['initialValue'] is not None:
+                        if parameter_type == 'TupleNumber':
+                            layer_def[key] = tuple(parameter['options']['initialValue'])
+                        else:
+                            layer_def[key] = parameter['options']['initialValue']
+
+            model_defs['layers'][node_id] = layer_def
+
+    # 遍历连线
+    for node_or_line in pens:
+        if 'type' not in node_or_line:
+            raise Exception("Each entry in the pens must define the Type parameter")
+        pens_type = node_or_line['type']
+        if pens_type == 1:  # 连线
+            line = node_or_line
+            if 'id' not in line or 'from' not in line or 'id' not in line['from'] or 'to' not in line or 'id' not in \
+                    line['to']:
+                raise Exception("The line `{}` has no `id` or `from` or `to` defined".format(line))
+            if line['from']['id'] not in model_defs['layers'].keys() or line['to']['id'] not in model_defs['layers'].keys():
+                raise Exception("The line `{}` has no `id` defined in the lines".format(line))
+
+            if line['from']['id'] in model_defs['adjacency'].keys():
+                model_defs['adjacency'][line['from']['id']].append(line['to']['id'])
+            else:
+                model_defs['adjacency'][line['from']['id']] = [line['to']['id']]
+
+    if 'start' not in model_defs['start_and_end'].keys() or 'end' not in model_defs['start_and_end'].keys():
+        raise Exception("No `start` or `end` node are defined in the configuration")
+
+    print("配置文件节点数量={}".format(len(model_defs['layers'].keys())))
+
+    return Model(model_defs=model_defs)
+
+
 if __name__ == '__main__':
     # _test_create_model()
 
@@ -454,7 +546,7 @@ if __name__ == '__main__':
     # graph += "}\n"
     # print(graph)
 
-    model = load_model_from_json("./yolo/yolov3.json", 3)
+    model = load_model_from_json2("test/test5.json", 3)
     print(model)
     input = torch.rand(1, 3, 224, 224)
     outputs = model(input)

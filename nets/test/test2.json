@@ -1,0 +1,2677 @@
+{
+	"pens": [{
+		"id": "738ce8e3",
+		"type": 0,
+		"name": "rectangle",
+		"rect": {
+			"x": 441,
+			"y": 189,
+			"width": 96,
+			"height": 36,
+			"center": {
+				"x": 489,
+				"y": 207
+			},
+			"ex": 537,
+			"ey": 225
+		},
+		"lineWidth": 1,
+		"rotate": 0,
+		"offsetRotate": 0,
+		"globalAlpha": 1,
+		"dash": 0,
+		"strokeStyle": "#222",
+		"fillStyle": "",
+		"font": {
+			"color": "#222",
+			"fontFamily": "\"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial",
+			"fontSize": 12,
+			"lineHeight": 1.5,
+			"fontStyle": "normal",
+			"fontWeight": "normal",
+			"textAlign": "center",
+			"textBaseline": "middle",
+			"background": ""
+		},
+		"animateCycleIndex": 0,
+		"events": [],
+		"eventFns": ["link", "doAnimate", "doFn", "doWindowFn"],
+		"tags": [],
+		"lineDashOffset": 0,
+		"text": "Conv2d",
+		"textOffsetX": 0,
+		"textOffsetY": 0,
+		"animateType": "",
+		"visible": true,
+		"data": {
+			"layer": {
+				"type": "Conv2d",
+				"start_or_end": "start"
+			},
+			"parameters": [{
+				"label": "out_channels",
+				"type": "InputNumber",
+				"placeholder": "必填",
+				"options": {
+					"rules": [{
+						"required": true,
+						"message": "parameter is required"
+					}]
+				},
+				"value": 10
+			}, {
+				"label": "kernel_size",
+				"type": "InputNumber",
+				"placeholder": "必填",
+				"options": {
+					"rules": [{
+						"required": true,
+						"message": "parameter is required"
+					}]
+				},
+				"value": 1
+			}, {
+				"label": "stride",
+				"type": "InputNumber",
+				"placeholder": "默认1",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "padding",
+				"type": "InputNumber",
+				"placeholder": "默认0",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "dilation",
+				"type": "InputNumber",
+				"placeholder": "默认1",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "groups",
+				"type": "InputNumber",
+				"placeholder": "默认1",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "bias",
+				"type": "Radio",
+				"placeholder": "默认true",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				},
+				"option": [{
+					"text": "None"
+				}, {
+					"value": true,
+					"text": "true"
+				}, {
+					"value": false,
+					"text": "false"
+				}]
+			}, {
+				"label": "padding_mode",
+				"type": "Select",
+				"placeholder": "默认zeros",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				},
+				"option": [{
+					"value": "zeros",
+					"text": "zeros"
+				}, {
+					"value": "reflect",
+					"text": "reflect"
+				}, {
+					"value": "replicate",
+					"text": "replicate"
+				}, {
+					"value": "circular",
+					"text": "circular"
+				}]
+			}]
+		},
+		"zRotate": 0,
+		"anchors": [{
+			"x": 441,
+			"y": 207,
+			"direction": 4
+		}, {
+			"x": 489,
+			"y": 189,
+			"direction": 1
+		}, {
+			"x": 537,
+			"y": 207,
+			"direction": 2
+		}, {
+			"x": 489,
+			"y": 225,
+			"direction": 3
+		}],
+		"rotatedAnchors": [{
+			"x": 441,
+			"y": 207,
+			"direction": 4
+		}, {
+			"x": 489,
+			"y": 189,
+			"direction": 1
+		}, {
+			"x": 537,
+			"y": 207,
+			"direction": 2
+		}, {
+			"x": 489,
+			"y": 225,
+			"direction": 3
+		}],
+		"animateDuration": 0,
+		"animateFrames": [],
+		"borderRadius": 0,
+		"iconSize": 0,
+		"imageAlign": "center",
+		"gradientAngle": 0,
+		"gradientRadius": 0.01,
+		"paddingTop": 0,
+		"paddingBottom": 0,
+		"paddingLeft": 0,
+		"paddingRight": 0,
+		"paddingLeftNum": 0,
+		"paddingRightNum": 0,
+		"paddingTopNum": 0,
+		"paddingBottomNum": 0,
+		"textRect": {
+			"x": 477,
+			"y": 189,
+			"width": 60,
+			"height": 36,
+			"center": {
+				"x": 507,
+				"y": 207
+			},
+			"ex": 537,
+			"ey": 225
+		},
+		"fullTextRect": {
+			"x": 441,
+			"y": 189,
+			"width": 96,
+			"height": 36,
+			"center": {
+				"x": 489,
+				"y": 207
+			},
+			"ex": 537,
+			"ey": 225
+		},
+		"iconRect": {
+			"x": 441,
+			"y": 189,
+			"width": 36,
+			"height": 36,
+			"center": {
+				"x": 459,
+				"y": 207
+			},
+			"ex": 477,
+			"ey": 225
+		},
+		"fullIconRect": {
+			"x": 441,
+			"y": 189,
+			"width": 96,
+			"height": 36,
+			"center": {
+				"x": 489,
+				"y": 207
+			},
+			"ex": 537,
+			"ey": 225
+		},
+		"elementRendered": false,
+		"dockWatchers": [{
+			"x": 489,
+			"y": 207
+		}, {
+			"x": 441,
+			"y": 189
+		}, {
+			"x": 537,
+			"y": 189
+		}, {
+			"x": 537,
+			"y": 225
+		}, {
+			"x": 441,
+			"y": 225
+		}]
+	}, {
+		"id": "4b8a981e",
+		"type": 0,
+		"name": "rectangle",
+		"rect": {
+			"x": 440,
+			"y": 281,
+			"width": 98,
+			"height": 35,
+			"center": {
+				"x": 489,
+				"y": 298.5
+			},
+			"ex": 538,
+			"ey": 316
+		},
+		"lineWidth": 1,
+		"rotate": 0,
+		"offsetRotate": 0,
+		"globalAlpha": 1,
+		"dash": 0,
+		"strokeStyle": "#222",
+		"fillStyle": "",
+		"font": {
+			"color": "#222",
+			"fontFamily": "\"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial",
+			"fontSize": 12,
+			"lineHeight": 1.5,
+			"fontStyle": "normal",
+			"fontWeight": "normal",
+			"textAlign": "center",
+			"textBaseline": "middle",
+			"background": ""
+		},
+		"animateCycleIndex": 0,
+		"events": [],
+		"eventFns": ["link", "doAnimate", "doFn", "doWindowFn"],
+		"tags": [],
+		"lineDashOffset": 0,
+		"text": "Conv2d",
+		"textOffsetX": 0,
+		"textOffsetY": 0,
+		"animateType": "",
+		"visible": true,
+		"data": {
+			"layer": {
+				"type": "Conv2d"
+			},
+			"parameters": [{
+				"label": "out_channels",
+				"type": "InputNumber",
+				"placeholder": "必填",
+				"options": {
+					"rules": [{
+						"required": true,
+						"message": "parameter is required"
+					}]
+				},
+				"value": 10
+			}, {
+				"label": "kernel_size",
+				"type": "InputNumber",
+				"placeholder": "必填",
+				"options": {
+					"rules": [{
+						"required": true,
+						"message": "parameter is required"
+					}]
+				},
+				"value": 1
+			}, {
+				"label": "stride",
+				"type": "InputNumber",
+				"placeholder": "默认1",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "padding",
+				"type": "InputNumber",
+				"placeholder": "默认0",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "dilation",
+				"type": "InputNumber",
+				"placeholder": "默认1",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "groups",
+				"type": "InputNumber",
+				"placeholder": "默认1",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "bias",
+				"type": "Radio",
+				"placeholder": "默认true",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				},
+				"option": [{
+					"text": "None"
+				}, {
+					"value": true,
+					"text": "true"
+				}, {
+					"value": false,
+					"text": "false"
+				}]
+			}, {
+				"label": "padding_mode",
+				"type": "Select",
+				"placeholder": "默认zeros",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				},
+				"option": [{
+					"value": "zeros",
+					"text": "zeros"
+				}, {
+					"value": "reflect",
+					"text": "reflect"
+				}, {
+					"value": "replicate",
+					"text": "replicate"
+				}, {
+					"value": "circular",
+					"text": "circular"
+				}]
+			}]
+		},
+		"zRotate": 0,
+		"anchors": [{
+			"x": 440,
+			"y": 298.5,
+			"direction": 4
+		}, {
+			"x": 489,
+			"y": 281,
+			"direction": 1
+		}, {
+			"x": 538,
+			"y": 298.5,
+			"direction": 2
+		}, {
+			"x": 489,
+			"y": 316,
+			"direction": 3
+		}],
+		"rotatedAnchors": [{
+			"x": 440,
+			"y": 298.5,
+			"direction": 4
+		}, {
+			"x": 489,
+			"y": 281,
+			"direction": 1
+		}, {
+			"x": 538,
+			"y": 298.5,
+			"direction": 2
+		}, {
+			"x": 489,
+			"y": 316,
+			"direction": 3
+		}],
+		"animateDuration": 0,
+		"animateFrames": [],
+		"borderRadius": 0,
+		"iconSize": 0,
+		"imageAlign": "center",
+		"gradientAngle": 0,
+		"gradientRadius": 0.01,
+		"paddingTop": 0,
+		"paddingBottom": 0,
+		"paddingLeft": 0,
+		"paddingRight": 0,
+		"paddingLeftNum": 0,
+		"paddingRightNum": 0,
+		"paddingTopNum": 0,
+		"paddingBottomNum": 0,
+		"textRect": {
+			"x": 475,
+			"y": 281,
+			"width": 63,
+			"height": 35,
+			"center": {
+				"x": 506.5,
+				"y": 298.5
+			},
+			"ex": 538,
+			"ey": 316
+		},
+		"fullTextRect": {
+			"x": 440,
+			"y": 281,
+			"width": 98,
+			"height": 35,
+			"center": {
+				"x": 489,
+				"y": 298.5
+			},
+			"ex": 538,
+			"ey": 316
+		},
+		"iconRect": {
+			"x": 440,
+			"y": 281,
+			"width": 35,
+			"height": 35,
+			"center": {
+				"x": 457.5,
+				"y": 298.5
+			},
+			"ex": 475,
+			"ey": 316
+		},
+		"fullIconRect": {
+			"x": 440,
+			"y": 281,
+			"width": 98,
+			"height": 35,
+			"center": {
+				"x": 489,
+				"y": 298.5
+			},
+			"ex": 538,
+			"ey": 316
+		},
+		"elementRendered": false,
+		"dockWatchers": [{
+			"x": 489,
+			"y": 298.5
+		}, {
+			"x": 440,
+			"y": 281
+		}, {
+			"x": 538,
+			"y": 281
+		}, {
+			"x": 538,
+			"y": 316
+		}, {
+			"x": 440,
+			"y": 316
+		}]
+	}, {
+		"id": "e7f99ea2",
+		"type": 1,
+		"name": "polyline",
+		"rect": {
+			"x": 0,
+			"y": 0,
+			"width": 0,
+			"height": 0,
+			"center": {
+				"x": 0,
+				"y": 0
+			},
+			"ex": 0,
+			"ey": 0
+		},
+		"lineWidth": 1,
+		"rotate": 0,
+		"offsetRotate": 0,
+		"globalAlpha": 1,
+		"dash": 0,
+		"strokeStyle": "#222",
+		"fillStyle": "",
+		"font": {
+			"color": "",
+			"fontFamily": "\"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial",
+			"fontSize": 12,
+			"lineHeight": 1.5,
+			"fontStyle": "normal",
+			"fontWeight": "normal",
+			"textAlign": "center",
+			"textBaseline": "middle",
+			"background": "#fff"
+		},
+		"animateCycleIndex": 0,
+		"events": [],
+		"eventFns": ["link", "doAnimate", "doFn", "doWindowFn"],
+		"tags": [],
+		"lineDashOffset": 0,
+		"textOffsetX": 0,
+		"textOffsetY": 0,
+		"visible": true,
+		"data": "",
+		"controlPoints": [{
+			"x": 489,
+			"y": 253,
+			"direction": 3,
+			"anchorIndex": 3,
+			"id": "738ce8e3"
+		}, {
+			"x": 489,
+			"y": 253,
+			"direction": 1,
+			"anchorIndex": 1,
+			"id": "4b8a981e"
+		}],
+		"fromArrowSize": 5,
+		"toArrowSize": 5,
+		"borderWidth": 0,
+		"borderColor": "#000000",
+		"animateColor": "",
+		"animateSpan": 1,
+		"animatePos": 0,
+		"isAnimate": false,
+		"animateFromSize": 0,
+		"animateToSize": 0,
+		"animateDotSize": 3,
+		"from": {
+			"x": 489,
+			"y": 225,
+			"direction": 3,
+			"anchorIndex": 3,
+			"id": "738ce8e3"
+		},
+		"to": {
+			"x": 489,
+			"y": 281,
+			"direction": 1,
+			"anchorIndex": 1,
+			"id": "4b8a981e"
+		},
+		"fromArrow": "",
+		"toArrow": "triangleSolid",
+		"manualCps": false,
+		"textRect": null
+	}, {
+		"id": "84a987f6",
+		"type": 0,
+		"name": "rectangle",
+		"rect": {
+			"x": 438.5,
+			"y": 366,
+			"width": 101,
+			"height": 38,
+			"center": {
+				"x": 489,
+				"y": 385
+			},
+			"ex": 539.5,
+			"ey": 404
+		},
+		"lineWidth": 1,
+		"rotate": 0,
+		"offsetRotate": 0,
+		"globalAlpha": 1,
+		"dash": 0,
+		"strokeStyle": "#222",
+		"fillStyle": "",
+		"font": {
+			"color": "#222",
+			"fontFamily": "\"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial",
+			"fontSize": 12,
+			"lineHeight": 1.5,
+			"fontStyle": "normal",
+			"fontWeight": "normal",
+			"textAlign": "center",
+			"textBaseline": "middle",
+			"background": ""
+		},
+		"animateCycleIndex": 0,
+		"events": [],
+		"eventFns": ["link", "doAnimate", "doFn", "doWindowFn"],
+		"tags": [],
+		"lineDashOffset": 0,
+		"text": "Conv2d",
+		"textOffsetX": 0,
+		"textOffsetY": 0,
+		"animateType": "",
+		"visible": true,
+		"data": {
+			"layer": {
+				"type": "Conv2d"
+			},
+			"parameters": [{
+				"label": "out_channels",
+				"type": "InputNumber",
+				"placeholder": "必填",
+				"options": {
+					"rules": [{
+						"required": true,
+						"message": "parameter is required"
+					}]
+				},
+				"value": 10
+			}, {
+				"label": "kernel_size",
+				"type": "InputNumber",
+				"placeholder": "必填",
+				"options": {
+					"rules": [{
+						"required": true,
+						"message": "parameter is required"
+					}]
+				},
+				"value": 1
+			}, {
+				"label": "stride",
+				"type": "InputNumber",
+				"placeholder": "默认1",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "padding",
+				"type": "InputNumber",
+				"placeholder": "默认0",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "dilation",
+				"type": "InputNumber",
+				"placeholder": "默认1",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "groups",
+				"type": "InputNumber",
+				"placeholder": "默认1",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "bias",
+				"type": "Radio",
+				"placeholder": "默认true",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				},
+				"option": [{
+					"text": "None"
+				}, {
+					"value": true,
+					"text": "true"
+				}, {
+					"value": false,
+					"text": "false"
+				}]
+			}, {
+				"label": "padding_mode",
+				"type": "Select",
+				"placeholder": "默认zeros",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				},
+				"option": [{
+					"value": "zeros",
+					"text": "zeros"
+				}, {
+					"value": "reflect",
+					"text": "reflect"
+				}, {
+					"value": "replicate",
+					"text": "replicate"
+				}, {
+					"value": "circular",
+					"text": "circular"
+				}]
+			}]
+		},
+		"zRotate": 0,
+		"anchors": [{
+			"x": 438.5,
+			"y": 385,
+			"direction": 4
+		}, {
+			"x": 489,
+			"y": 366,
+			"direction": 1
+		}, {
+			"x": 539.5,
+			"y": 385,
+			"direction": 2
+		}, {
+			"x": 489,
+			"y": 404,
+			"direction": 3
+		}],
+		"rotatedAnchors": [{
+			"x": 438.5,
+			"y": 385,
+			"direction": 4
+		}, {
+			"x": 489,
+			"y": 366,
+			"direction": 1
+		}, {
+			"x": 539.5,
+			"y": 385,
+			"direction": 2
+		}, {
+			"x": 489,
+			"y": 404,
+			"direction": 3
+		}],
+		"animateDuration": 0,
+		"animateFrames": [],
+		"borderRadius": 0,
+		"iconSize": 0,
+		"imageAlign": "center",
+		"gradientAngle": 0,
+		"gradientRadius": 0.01,
+		"paddingTop": 0,
+		"paddingBottom": 0,
+		"paddingLeft": 0,
+		"paddingRight": 0,
+		"paddingLeftNum": 0,
+		"paddingRightNum": 0,
+		"paddingTopNum": 0,
+		"paddingBottomNum": 0,
+		"textRect": {
+			"x": 476.5,
+			"y": 366,
+			"width": 63,
+			"height": 38,
+			"center": {
+				"x": 508,
+				"y": 385
+			},
+			"ex": 539.5,
+			"ey": 404
+		},
+		"fullTextRect": {
+			"x": 438.5,
+			"y": 366,
+			"width": 101,
+			"height": 38,
+			"center": {
+				"x": 489,
+				"y": 385
+			},
+			"ex": 539.5,
+			"ey": 404
+		},
+		"iconRect": {
+			"x": 438.5,
+			"y": 366,
+			"width": 38,
+			"height": 38,
+			"center": {
+				"x": 457.5,
+				"y": 385
+			},
+			"ex": 476.5,
+			"ey": 404
+		},
+		"fullIconRect": {
+			"x": 438.5,
+			"y": 366,
+			"width": 101,
+			"height": 38,
+			"center": {
+				"x": 489,
+				"y": 385
+			},
+			"ex": 539.5,
+			"ey": 404
+		},
+		"elementRendered": false,
+		"dockWatchers": [{
+			"x": 489,
+			"y": 385
+		}, {
+			"x": 438.5,
+			"y": 366
+		}, {
+			"x": 539.5,
+			"y": 366
+		}, {
+			"x": 539.5,
+			"y": 404
+		}, {
+			"x": 438.5,
+			"y": 404
+		}]
+	}, {
+		"id": "e78e88b0",
+		"type": 1,
+		"name": "polyline",
+		"rect": {
+			"x": 0,
+			"y": 0,
+			"width": 0,
+			"height": 0,
+			"center": {
+				"x": 0,
+				"y": 0
+			},
+			"ex": 0,
+			"ey": 0
+		},
+		"lineWidth": 1,
+		"rotate": 0,
+		"offsetRotate": 0,
+		"globalAlpha": 1,
+		"dash": 0,
+		"strokeStyle": "#222",
+		"fillStyle": "",
+		"font": {
+			"color": "",
+			"fontFamily": "\"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial",
+			"fontSize": 12,
+			"lineHeight": 1.5,
+			"fontStyle": "normal",
+			"fontWeight": "normal",
+			"textAlign": "center",
+			"textBaseline": "middle",
+			"background": "#fff"
+		},
+		"animateCycleIndex": 0,
+		"events": [],
+		"eventFns": ["link", "doAnimate", "doFn", "doWindowFn"],
+		"tags": [],
+		"lineDashOffset": 0,
+		"textOffsetX": 0,
+		"textOffsetY": 0,
+		"visible": true,
+		"data": "",
+		"controlPoints": [{
+			"x": 489,
+			"y": 341,
+			"direction": 3,
+			"anchorIndex": 3,
+			"id": "4b8a981e"
+		}, {
+			"x": 489,
+			"y": 341,
+			"direction": 1,
+			"anchorIndex": 1,
+			"id": "84a987f6"
+		}],
+		"fromArrowSize": 5,
+		"toArrowSize": 5,
+		"borderWidth": 0,
+		"borderColor": "#000000",
+		"animateColor": "",
+		"animateSpan": 1,
+		"animatePos": 0,
+		"isAnimate": false,
+		"animateFromSize": 0,
+		"animateToSize": 0,
+		"animateDotSize": 3,
+		"from": {
+			"x": 489,
+			"y": 316,
+			"direction": 3,
+			"anchorIndex": 3,
+			"id": "4b8a981e"
+		},
+		"to": {
+			"x": 489,
+			"y": 366,
+			"direction": 1,
+			"anchorIndex": 1,
+			"id": "84a987f6"
+		},
+		"fromArrow": "",
+		"toArrow": "triangleSolid",
+		"manualCps": false,
+		"textRect": null
+	}, {
+		"id": "0711f105",
+		"type": 0,
+		"name": "shortcut",
+		"rect": {
+			"x": 464,
+			"y": 468,
+			"width": 50,
+			"height": 50,
+			"center": {
+				"x": 489,
+				"y": 493
+			},
+			"ex": 514,
+			"ey": 518
+		},
+		"lineWidth": 1,
+		"rotate": 0,
+		"offsetRotate": 0,
+		"globalAlpha": 1,
+		"dash": 0,
+		"strokeStyle": "#222",
+		"fillStyle": "",
+		"font": {
+			"color": "#222",
+			"fontFamily": "\"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial",
+			"fontSize": 12,
+			"lineHeight": 1.5,
+			"fontStyle": "normal",
+			"fontWeight": "normal",
+			"textAlign": "center",
+			"textBaseline": "middle",
+			"background": ""
+		},
+		"animateCycleIndex": 0,
+		"events": [],
+		"eventFns": ["link", "doAnimate", "doFn", "doWindowFn"],
+		"tags": [],
+		"lineDashOffset": 0,
+		"text": "shortcut",
+		"textOffsetX": 0,
+		"textOffsetY": 0,
+		"animateType": "",
+		"visible": true,
+		"data": {
+			"layer": {
+				"type": "shortcut"
+			},
+			"parameters": []
+		},
+		"zRotate": 0,
+		"anchors": [{
+			"x": 464,
+			"y": 493,
+			"direction": 4
+		}, {
+			"x": 489,
+			"y": 468,
+			"direction": 1
+		}, {
+			"x": 514,
+			"y": 493,
+			"direction": 2
+		}, {
+			"x": 489,
+			"y": 518,
+			"direction": 3
+		}],
+		"rotatedAnchors": [{
+			"x": 464,
+			"y": 493,
+			"direction": 4
+		}, {
+			"x": 489,
+			"y": 468,
+			"direction": 1
+		}, {
+			"x": 514,
+			"y": 493,
+			"direction": 2
+		}, {
+			"x": 489,
+			"y": 518,
+			"direction": 3
+		}],
+		"animateDuration": 0,
+		"animateFrames": [],
+		"borderRadius": 0,
+		"iconSize": 0,
+		"imageAlign": "center",
+		"gradientAngle": 0,
+		"gradientRadius": 0.01,
+		"paddingTop": 0,
+		"paddingBottom": 0,
+		"paddingLeft": 0,
+		"paddingRight": 0,
+		"paddingLeftNum": 0,
+		"paddingRightNum": 0,
+		"paddingTopNum": 0,
+		"paddingBottomNum": 0,
+		"textRect": {
+			"x": 464,
+			"y": 505.5,
+			"width": 50,
+			"height": 12.5,
+			"center": {
+				"x": 489,
+				"y": 511.75
+			},
+			"ex": 514,
+			"ey": 518
+		},
+		"fullTextRect": {
+			"x": 464,
+			"y": 468,
+			"width": 50,
+			"height": 50,
+			"center": {
+				"x": 489,
+				"y": 493
+			},
+			"ex": 514,
+			"ey": 518
+		},
+		"iconRect": {
+			"x": 464,
+			"y": 468,
+			"width": 50,
+			"height": 37.5,
+			"center": {
+				"x": 489,
+				"y": 486.75
+			},
+			"ex": 514,
+			"ey": 505.5
+		},
+		"fullIconRect": {
+			"x": 464,
+			"y": 468,
+			"width": 50,
+			"height": 50,
+			"center": {
+				"x": 489,
+				"y": 493
+			},
+			"ex": 514,
+			"ey": 518
+		},
+		"elementRendered": false,
+		"dockWatchers": [{
+			"x": 489,
+			"y": 493
+		}, {
+			"x": 464,
+			"y": 468
+		}, {
+			"x": 514,
+			"y": 468
+		}, {
+			"x": 514,
+			"y": 518
+		}, {
+			"x": 464,
+			"y": 518
+		}]
+	}, {
+		"id": "e9964872",
+		"type": 1,
+		"name": "polyline",
+		"rect": {
+			"x": 0,
+			"y": 0,
+			"width": 0,
+			"height": 0,
+			"center": {
+				"x": 0,
+				"y": 0
+			},
+			"ex": 0,
+			"ey": 0
+		},
+		"lineWidth": 1,
+		"rotate": 0,
+		"offsetRotate": 0,
+		"globalAlpha": 1,
+		"dash": 0,
+		"strokeStyle": "#222",
+		"fillStyle": "",
+		"font": {
+			"color": "",
+			"fontFamily": "\"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial",
+			"fontSize": 12,
+			"lineHeight": 1.5,
+			"fontStyle": "normal",
+			"fontWeight": "normal",
+			"textAlign": "center",
+			"textBaseline": "middle",
+			"background": "#fff"
+		},
+		"animateCycleIndex": 0,
+		"events": [],
+		"eventFns": ["link", "doAnimate", "doFn", "doWindowFn"],
+		"tags": [],
+		"lineDashOffset": 0,
+		"textOffsetX": 0,
+		"textOffsetY": 0,
+		"visible": true,
+		"data": "",
+		"controlPoints": [{
+			"x": 489,
+			"y": 436,
+			"direction": 3,
+			"anchorIndex": 3,
+			"id": "84a987f6"
+		}, {
+			"x": 489,
+			"y": 436,
+			"direction": 1,
+			"anchorIndex": 1,
+			"id": "0711f105"
+		}],
+		"fromArrowSize": 5,
+		"toArrowSize": 5,
+		"borderWidth": 0,
+		"borderColor": "#000000",
+		"animateColor": "",
+		"animateSpan": 1,
+		"animatePos": 0,
+		"isAnimate": false,
+		"animateFromSize": 0,
+		"animateToSize": 0,
+		"animateDotSize": 3,
+		"from": {
+			"x": 489,
+			"y": 404,
+			"direction": 3,
+			"anchorIndex": 3,
+			"id": "84a987f6"
+		},
+		"to": {
+			"x": 489,
+			"y": 468,
+			"direction": 1,
+			"anchorIndex": 1,
+			"id": "0711f105"
+		},
+		"fromArrow": "",
+		"toArrow": "triangleSolid",
+		"manualCps": false,
+		"textRect": null
+	}, {
+		"id": "dd0fc083",
+		"type": 0,
+		"name": "shortcut",
+		"rect": {
+			"x": 464,
+			"y": 581,
+			"width": 50,
+			"height": 50,
+			"center": {
+				"x": 489,
+				"y": 606
+			},
+			"ex": 514,
+			"ey": 631
+		},
+		"lineWidth": 1,
+		"rotate": 0,
+		"offsetRotate": 0,
+		"globalAlpha": 1,
+		"dash": 0,
+		"strokeStyle": "#222",
+		"fillStyle": "",
+		"font": {
+			"color": "#222",
+			"fontFamily": "\"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial",
+			"fontSize": 12,
+			"lineHeight": 1.5,
+			"fontStyle": "normal",
+			"fontWeight": "normal",
+			"textAlign": "center",
+			"textBaseline": "middle",
+			"background": ""
+		},
+		"animateCycleIndex": 0,
+		"events": [],
+		"eventFns": ["link", "doAnimate", "doFn", "doWindowFn"],
+		"tags": [],
+		"lineDashOffset": 0,
+		"text": "shortcut",
+		"textOffsetX": 0,
+		"textOffsetY": 0,
+		"animateType": "",
+		"visible": true,
+		"data": {
+			"layer": {
+				"type": "shortcut"
+			},
+			"parameters": []
+		},
+		"zRotate": 0,
+		"anchors": [{
+			"x": 464,
+			"y": 606,
+			"direction": 4
+		}, {
+			"x": 489,
+			"y": 581,
+			"direction": 1
+		}, {
+			"x": 514,
+			"y": 606,
+			"direction": 2
+		}, {
+			"x": 489,
+			"y": 631,
+			"direction": 3
+		}],
+		"rotatedAnchors": [{
+			"x": 464,
+			"y": 606,
+			"direction": 4
+		}, {
+			"x": 489,
+			"y": 581,
+			"direction": 1
+		}, {
+			"x": 514,
+			"y": 606,
+			"direction": 2
+		}, {
+			"x": 489,
+			"y": 631,
+			"direction": 3
+		}],
+		"animateDuration": 0,
+		"animateFrames": [],
+		"borderRadius": 0,
+		"iconSize": 0,
+		"imageAlign": "center",
+		"gradientAngle": 0,
+		"gradientRadius": 0.01,
+		"paddingTop": 0,
+		"paddingBottom": 0,
+		"paddingLeft": 0,
+		"paddingRight": 0,
+		"paddingLeftNum": 0,
+		"paddingRightNum": 0,
+		"paddingTopNum": 0,
+		"paddingBottomNum": 0,
+		"textRect": {
+			"x": 464,
+			"y": 618.5,
+			"width": 50,
+			"height": 12.5,
+			"center": {
+				"x": 489,
+				"y": 624.75
+			},
+			"ex": 514,
+			"ey": 631
+		},
+		"fullTextRect": {
+			"x": 464,
+			"y": 581,
+			"width": 50,
+			"height": 50,
+			"center": {
+				"x": 489,
+				"y": 606
+			},
+			"ex": 514,
+			"ey": 631
+		},
+		"iconRect": {
+			"x": 464,
+			"y": 581,
+			"width": 50,
+			"height": 37.5,
+			"center": {
+				"x": 489,
+				"y": 599.75
+			},
+			"ex": 514,
+			"ey": 618.5
+		},
+		"fullIconRect": {
+			"x": 464,
+			"y": 581,
+			"width": 50,
+			"height": 50,
+			"center": {
+				"x": 489,
+				"y": 606
+			},
+			"ex": 514,
+			"ey": 631
+		},
+		"elementRendered": false,
+		"dockWatchers": [{
+			"x": 489,
+			"y": 606
+		}, {
+			"x": 464,
+			"y": 581
+		}, {
+			"x": 514,
+			"y": 581
+		}, {
+			"x": 514,
+			"y": 631
+		}, {
+			"x": 464,
+			"y": 631
+		}]
+	}, {
+		"id": "6a397fea",
+		"type": 1,
+		"name": "polyline",
+		"rect": {
+			"x": 0,
+			"y": 0,
+			"width": 0,
+			"height": 0,
+			"center": {
+				"x": 0,
+				"y": 0
+			},
+			"ex": 0,
+			"ey": 0
+		},
+		"lineWidth": 1,
+		"rotate": 0,
+		"offsetRotate": 0,
+		"globalAlpha": 1,
+		"dash": 0,
+		"strokeStyle": "#222",
+		"fillStyle": "",
+		"font": {
+			"color": "",
+			"fontFamily": "\"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial",
+			"fontSize": 12,
+			"lineHeight": 1.5,
+			"fontStyle": "normal",
+			"fontWeight": "normal",
+			"textAlign": "center",
+			"textBaseline": "middle",
+			"background": "#fff"
+		},
+		"animateCycleIndex": 0,
+		"events": [],
+		"eventFns": ["link", "doAnimate", "doFn", "doWindowFn"],
+		"tags": [],
+		"lineDashOffset": 0,
+		"textOffsetX": 0,
+		"textOffsetY": 0,
+		"visible": true,
+		"data": "",
+		"controlPoints": [{
+			"x": 489,
+			"y": 549,
+			"direction": 3,
+			"anchorIndex": 3,
+			"id": "0711f105"
+		}, {
+			"x": 489,
+			"y": 550,
+			"direction": 1,
+			"anchorIndex": 1,
+			"id": "dd0fc083"
+		}],
+		"fromArrowSize": 5,
+		"toArrowSize": 5,
+		"borderWidth": 0,
+		"borderColor": "#000000",
+		"animateColor": "",
+		"animateSpan": 1,
+		"animatePos": 0,
+		"isAnimate": false,
+		"animateFromSize": 0,
+		"animateToSize": 0,
+		"animateDotSize": 3,
+		"from": {
+			"x": 489,
+			"y": 518,
+			"direction": 3,
+			"anchorIndex": 3,
+			"id": "0711f105"
+		},
+		"to": {
+			"x": 489,
+			"y": 581,
+			"direction": 1,
+			"anchorIndex": 1,
+			"id": "dd0fc083"
+		},
+		"fromArrow": "",
+		"toArrow": "triangleSolid",
+		"manualCps": false,
+		"textRect": null
+	}, {
+		"id": "04142aab",
+		"type": 0,
+		"name": "rectangle",
+		"rect": {
+			"x": 606,
+			"y": 475,
+			"width": 103,
+			"height": 36,
+			"center": {
+				"x": 657.5,
+				"y": 493
+			},
+			"ex": 709,
+			"ey": 511
+		},
+		"lineWidth": 1,
+		"rotate": 0,
+		"offsetRotate": 0,
+		"globalAlpha": 1,
+		"dash": 0,
+		"strokeStyle": "#222",
+		"fillStyle": "",
+		"font": {
+			"color": "#222",
+			"fontFamily": "\"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial",
+			"fontSize": 12,
+			"lineHeight": 1.5,
+			"fontStyle": "normal",
+			"fontWeight": "normal",
+			"textAlign": "center",
+			"textBaseline": "middle",
+			"background": ""
+		},
+		"animateCycleIndex": 0,
+		"events": [],
+		"eventFns": ["link", "doAnimate", "doFn", "doWindowFn"],
+		"tags": [],
+		"lineDashOffset": 0,
+		"text": "Conv2d",
+		"textOffsetX": 0,
+		"textOffsetY": 0,
+		"animateType": "",
+		"visible": true,
+		"data": {
+			"layer": {
+				"type": "Conv2d"
+			},
+			"parameters": [{
+				"label": "out_channels",
+				"type": "InputNumber",
+				"placeholder": "必填",
+				"options": {
+					"rules": [{
+						"required": true,
+						"message": "parameter is required"
+					}]
+				},
+				"value": 10
+			}, {
+				"label": "kernel_size",
+				"type": "InputNumber",
+				"placeholder": "必填",
+				"options": {
+					"rules": [{
+						"required": true,
+						"message": "parameter is required"
+					}]
+				},
+				"value": 1
+			}, {
+				"label": "stride",
+				"type": "InputNumber",
+				"placeholder": "默认1",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "padding",
+				"type": "InputNumber",
+				"placeholder": "默认0",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "dilation",
+				"type": "InputNumber",
+				"placeholder": "默认1",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "groups",
+				"type": "InputNumber",
+				"placeholder": "默认1",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "bias",
+				"type": "Radio",
+				"placeholder": "默认true",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				},
+				"option": [{
+					"text": "None"
+				}, {
+					"value": true,
+					"text": "true"
+				}, {
+					"value": false,
+					"text": "false"
+				}]
+			}, {
+				"label": "padding_mode",
+				"type": "Select",
+				"placeholder": "默认zeros",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				},
+				"option": [{
+					"value": "zeros",
+					"text": "zeros"
+				}, {
+					"value": "reflect",
+					"text": "reflect"
+				}, {
+					"value": "replicate",
+					"text": "replicate"
+				}, {
+					"value": "circular",
+					"text": "circular"
+				}]
+			}]
+		},
+		"zRotate": 0,
+		"anchors": [{
+			"x": 606,
+			"y": 493,
+			"direction": 4
+		}, {
+			"x": 657.5,
+			"y": 475,
+			"direction": 1
+		}, {
+			"x": 709,
+			"y": 493,
+			"direction": 2
+		}, {
+			"x": 657.5,
+			"y": 511,
+			"direction": 3
+		}],
+		"rotatedAnchors": [{
+			"x": 606,
+			"y": 493,
+			"direction": 4
+		}, {
+			"x": 657.5,
+			"y": 475,
+			"direction": 1
+		}, {
+			"x": 709,
+			"y": 493,
+			"direction": 2
+		}, {
+			"x": 657.5,
+			"y": 511,
+			"direction": 3
+		}],
+		"animateDuration": 0,
+		"animateFrames": [],
+		"borderRadius": 0,
+		"iconSize": 0,
+		"imageAlign": "center",
+		"gradientAngle": 0,
+		"gradientRadius": 0.01,
+		"paddingTop": 0,
+		"paddingBottom": 0,
+		"paddingLeft": 0,
+		"paddingRight": 0,
+		"paddingLeftNum": 0,
+		"paddingRightNum": 0,
+		"paddingTopNum": 0,
+		"paddingBottomNum": 0,
+		"textRect": {
+			"x": 642,
+			"y": 475,
+			"width": 67,
+			"height": 36,
+			"center": {
+				"x": 675.5,
+				"y": 493
+			},
+			"ex": 709,
+			"ey": 511
+		},
+		"fullTextRect": {
+			"x": 606,
+			"y": 475,
+			"width": 103,
+			"height": 36,
+			"center": {
+				"x": 657.5,
+				"y": 493
+			},
+			"ex": 709,
+			"ey": 511
+		},
+		"iconRect": {
+			"x": 606,
+			"y": 475,
+			"width": 36,
+			"height": 36,
+			"center": {
+				"x": 624,
+				"y": 493
+			},
+			"ex": 642,
+			"ey": 511
+		},
+		"fullIconRect": {
+			"x": 606,
+			"y": 475,
+			"width": 103,
+			"height": 36,
+			"center": {
+				"x": 657.5,
+				"y": 493
+			},
+			"ex": 709,
+			"ey": 511
+		},
+		"elementRendered": false,
+		"dockWatchers": [{
+			"x": 657.5,
+			"y": 493
+		}, {
+			"x": 606,
+			"y": 475
+		}, {
+			"x": 709,
+			"y": 475
+		}, {
+			"x": 709,
+			"y": 511
+		}, {
+			"x": 606,
+			"y": 511
+		}]
+	}, {
+		"id": "e56a8f0d",
+		"type": 1,
+		"name": "polyline",
+		"rect": {
+			"x": 0,
+			"y": 0,
+			"width": 0,
+			"height": 0,
+			"center": {
+				"x": 0,
+				"y": 0
+			},
+			"ex": 0,
+			"ey": 0
+		},
+		"lineWidth": 1,
+		"rotate": 0,
+		"offsetRotate": 0,
+		"globalAlpha": 1,
+		"dash": 0,
+		"strokeStyle": "#222",
+		"fillStyle": "",
+		"font": {
+			"color": "",
+			"fontFamily": "\"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial",
+			"fontSize": 12,
+			"lineHeight": 1.5,
+			"fontStyle": "normal",
+			"fontWeight": "normal",
+			"textAlign": "center",
+			"textBaseline": "middle",
+			"background": "#fff"
+		},
+		"animateCycleIndex": 0,
+		"events": [],
+		"eventFns": ["link", "doAnimate", "doFn", "doWindowFn"],
+		"tags": [],
+		"lineDashOffset": 0,
+		"textOffsetX": 0,
+		"textOffsetY": 0,
+		"visible": true,
+		"data": "",
+		"controlPoints": [{
+			"x": 598.5,
+			"y": 385,
+			"direction": 2,
+			"anchorIndex": 2,
+			"id": "84a987f6"
+		}, {
+			"x": 657.5,
+			"y": 385
+		}, {
+			"x": 657.5,
+			"y": 430,
+			"direction": 1,
+			"anchorIndex": 1,
+			"id": "04142aab"
+		}],
+		"fromArrowSize": 5,
+		"toArrowSize": 5,
+		"borderWidth": 0,
+		"borderColor": "#000000",
+		"animateColor": "",
+		"animateSpan": 1,
+		"animatePos": 0,
+		"isAnimate": false,
+		"animateFromSize": 0,
+		"animateToSize": 0,
+		"animateDotSize": 3,
+		"from": {
+			"x": 539.5,
+			"y": 385,
+			"direction": 2,
+			"anchorIndex": 2,
+			"id": "84a987f6"
+		},
+		"to": {
+			"x": 657.5,
+			"y": 475,
+			"direction": 1,
+			"anchorIndex": 1,
+			"id": "04142aab"
+		},
+		"fromArrow": "",
+		"toArrow": "triangleSolid",
+		"manualCps": false,
+		"textRect": null
+	}, {
+		"id": "aafdd586",
+		"type": 1,
+		"name": "polyline",
+		"rect": {
+			"x": 0,
+			"y": 0,
+			"width": 0,
+			"height": 0,
+			"center": {
+				"x": 0,
+				"y": 0
+			},
+			"ex": 0,
+			"ey": 0
+		},
+		"lineWidth": 1,
+		"rotate": 0,
+		"offsetRotate": 0,
+		"globalAlpha": 1,
+		"dash": 0,
+		"strokeStyle": "#222",
+		"fillStyle": "",
+		"font": {
+			"color": "",
+			"fontFamily": "\"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial",
+			"fontSize": 12,
+			"lineHeight": 1.5,
+			"fontStyle": "normal",
+			"fontWeight": "normal",
+			"textAlign": "center",
+			"textBaseline": "middle",
+			"background": "#fff"
+		},
+		"animateCycleIndex": 0,
+		"events": [],
+		"eventFns": ["link", "doAnimate", "doFn", "doWindowFn"],
+		"tags": [],
+		"lineDashOffset": 0,
+		"textOffsetX": 0,
+		"textOffsetY": 0,
+		"visible": true,
+		"data": "",
+		"controlPoints": [{
+			"x": 657.5,
+			"y": 558,
+			"direction": 3,
+			"anchorIndex": 3,
+			"id": "04142aab"
+		}, {
+			"x": 657.5,
+			"y": 606
+		}, {
+			"x": 585,
+			"y": 606,
+			"direction": 2,
+			"anchorIndex": 2,
+			"id": "dd0fc083"
+		}],
+		"fromArrowSize": 5,
+		"toArrowSize": 5,
+		"borderWidth": 0,
+		"borderColor": "#000000",
+		"animateColor": "",
+		"animateSpan": 1,
+		"animatePos": 0,
+		"isAnimate": false,
+		"animateFromSize": 0,
+		"animateToSize": 0,
+		"animateDotSize": 3,
+		"from": {
+			"x": 657.5,
+			"y": 511,
+			"direction": 3,
+			"anchorIndex": 3,
+			"id": "04142aab"
+		},
+		"to": {
+			"x": 514,
+			"y": 606,
+			"direction": 2,
+			"anchorIndex": 2,
+			"id": "dd0fc083"
+		},
+		"fromArrow": "",
+		"toArrow": "triangleSolid",
+		"manualCps": false,
+		"textRect": null
+	}, {
+		"id": "871967d3",
+		"type": 0,
+		"name": "rectangle",
+		"rect": {
+			"x": 442,
+			"y": 690,
+			"width": 94,
+			"height": 35,
+			"center": {
+				"x": 489,
+				"y": 707.5
+			},
+			"ex": 536,
+			"ey": 725
+		},
+		"lineWidth": 1,
+		"rotate": 0,
+		"offsetRotate": 0,
+		"globalAlpha": 1,
+		"dash": 0,
+		"strokeStyle": "#222",
+		"fillStyle": "",
+		"font": {
+			"color": "#222",
+			"fontFamily": "\"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial",
+			"fontSize": 12,
+			"lineHeight": 1.5,
+			"fontStyle": "normal",
+			"fontWeight": "normal",
+			"textAlign": "center",
+			"textBaseline": "middle",
+			"background": ""
+		},
+		"animateCycleIndex": 0,
+		"events": [],
+		"eventFns": ["link", "doAnimate", "doFn", "doWindowFn"],
+		"tags": [],
+		"lineDashOffset": 0,
+		"text": "Conv2d",
+		"textOffsetX": 0,
+		"textOffsetY": 0,
+		"animateType": "",
+		"visible": true,
+		"data": {
+			"layer": {
+				"type": "Conv2d",
+				"start_or_end": "end"
+			},
+			"parameters": [{
+				"label": "out_channels",
+				"type": "InputNumber",
+				"placeholder": "必填",
+				"options": {
+					"rules": [{
+						"required": true,
+						"message": "parameter is required"
+					}]
+				},
+				"value": 10
+			}, {
+				"label": "kernel_size",
+				"type": "InputNumber",
+				"placeholder": "必填",
+				"options": {
+					"rules": [{
+						"required": true,
+						"message": "parameter is required"
+					}]
+				},
+				"value": 1
+			}, {
+				"label": "stride",
+				"type": "InputNumber",
+				"placeholder": "默认1",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "padding",
+				"type": "InputNumber",
+				"placeholder": "默认0",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "dilation",
+				"type": "InputNumber",
+				"placeholder": "默认1",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "groups",
+				"type": "InputNumber",
+				"placeholder": "默认1",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "bias",
+				"type": "Radio",
+				"placeholder": "默认true",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				},
+				"option": [{
+					"text": "None"
+				}, {
+					"value": true,
+					"text": "true"
+				}, {
+					"value": false,
+					"text": "false"
+				}]
+			}, {
+				"label": "padding_mode",
+				"type": "Select",
+				"placeholder": "默认zeros",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				},
+				"option": [{
+					"value": "zeros",
+					"text": "zeros"
+				}, {
+					"value": "reflect",
+					"text": "reflect"
+				}, {
+					"value": "replicate",
+					"text": "replicate"
+				}, {
+					"value": "circular",
+					"text": "circular"
+				}]
+			}]
+		},
+		"zRotate": 0,
+		"anchors": [{
+			"x": 442,
+			"y": 707.5,
+			"direction": 4
+		}, {
+			"x": 489,
+			"y": 690,
+			"direction": 1
+		}, {
+			"x": 536,
+			"y": 707.5,
+			"direction": 2
+		}, {
+			"x": 489,
+			"y": 725,
+			"direction": 3
+		}],
+		"rotatedAnchors": [{
+			"x": 442,
+			"y": 707.5,
+			"direction": 4
+		}, {
+			"x": 489,
+			"y": 690,
+			"direction": 1
+		}, {
+			"x": 536,
+			"y": 707.5,
+			"direction": 2
+		}, {
+			"x": 489,
+			"y": 725,
+			"direction": 3
+		}],
+		"animateDuration": 0,
+		"animateFrames": [],
+		"borderRadius": 0,
+		"iconSize": 0,
+		"imageAlign": "center",
+		"gradientAngle": 0,
+		"gradientRadius": 0.01,
+		"paddingTop": 0,
+		"paddingBottom": 0,
+		"paddingLeft": 0,
+		"paddingRight": 0,
+		"paddingLeftNum": 0,
+		"paddingRightNum": 0,
+		"paddingTopNum": 0,
+		"paddingBottomNum": 0,
+		"textRect": {
+			"x": 477,
+			"y": 690,
+			"width": 59,
+			"height": 35,
+			"center": {
+				"x": 506.5,
+				"y": 707.5
+			},
+			"ex": 536,
+			"ey": 725
+		},
+		"fullTextRect": {
+			"x": 442,
+			"y": 690,
+			"width": 94,
+			"height": 35,
+			"center": {
+				"x": 489,
+				"y": 707.5
+			},
+			"ex": 536,
+			"ey": 725
+		},
+		"iconRect": {
+			"x": 442,
+			"y": 690,
+			"width": 35,
+			"height": 35,
+			"center": {
+				"x": 459.5,
+				"y": 707.5
+			},
+			"ex": 477,
+			"ey": 725
+		},
+		"fullIconRect": {
+			"x": 442,
+			"y": 690,
+			"width": 94,
+			"height": 35,
+			"center": {
+				"x": 489,
+				"y": 707.5
+			},
+			"ex": 536,
+			"ey": 725
+		},
+		"elementRendered": false,
+		"dockWatchers": [{
+			"x": 489,
+			"y": 707.5
+		}, {
+			"x": 442,
+			"y": 690
+		}, {
+			"x": 536,
+			"y": 690
+		}, {
+			"x": 536,
+			"y": 725
+		}, {
+			"x": 442,
+			"y": 725
+		}]
+	}, {
+		"id": "61d9a196",
+		"type": 1,
+		"name": "polyline",
+		"rect": {
+			"x": 0,
+			"y": 0,
+			"width": 0,
+			"height": 0,
+			"center": {
+				"x": 0,
+				"y": 0
+			},
+			"ex": 0,
+			"ey": 0
+		},
+		"lineWidth": 1,
+		"rotate": 0,
+		"offsetRotate": 0,
+		"globalAlpha": 1,
+		"dash": 0,
+		"strokeStyle": "#222",
+		"fillStyle": "",
+		"font": {
+			"color": "",
+			"fontFamily": "\"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial",
+			"fontSize": 12,
+			"lineHeight": 1.5,
+			"fontStyle": "normal",
+			"fontWeight": "normal",
+			"textAlign": "center",
+			"textBaseline": "middle",
+			"background": "#fff"
+		},
+		"animateCycleIndex": 0,
+		"events": [],
+		"eventFns": ["link", "doAnimate", "doFn", "doWindowFn"],
+		"tags": [],
+		"lineDashOffset": 0,
+		"textOffsetX": 0,
+		"textOffsetY": 0,
+		"visible": true,
+		"data": "",
+		"controlPoints": [{
+			"x": 489,
+			"y": 660,
+			"direction": 3,
+			"anchorIndex": 3,
+			"id": "dd0fc083"
+		}, {
+			"x": 489,
+			"y": 661,
+			"direction": 1,
+			"anchorIndex": 1,
+			"id": "871967d3"
+		}],
+		"fromArrowSize": 5,
+		"toArrowSize": 5,
+		"borderWidth": 0,
+		"borderColor": "#000000",
+		"animateColor": "",
+		"animateSpan": 1,
+		"animatePos": 0,
+		"isAnimate": false,
+		"animateFromSize": 0,
+		"animateToSize": 0,
+		"animateDotSize": 3,
+		"from": {
+			"x": 489,
+			"y": 631,
+			"direction": 3,
+			"anchorIndex": 3,
+			"id": "dd0fc083"
+		},
+		"to": {
+			"x": 489,
+			"y": 690,
+			"direction": 1,
+			"anchorIndex": 1,
+			"id": "871967d3"
+		},
+		"fromArrow": "",
+		"toArrow": "triangleSolid",
+		"manualCps": false,
+		"textRect": null
+	}, {
+		"id": "af79bc15",
+		"type": 0,
+		"name": "rectangle",
+		"rect": {
+			"x": 285,
+			"y": 367.5,
+			"width": 89,
+			"height": 35,
+			"center": {
+				"x": 329.5,
+				"y": 385
+			},
+			"ex": 374,
+			"ey": 402.5
+		},
+		"lineWidth": 1,
+		"rotate": 0,
+		"offsetRotate": 0,
+		"globalAlpha": 1,
+		"dash": 0,
+		"strokeStyle": "#222",
+		"fillStyle": "",
+		"font": {
+			"color": "#222",
+			"fontFamily": "\"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial",
+			"fontSize": 12,
+			"lineHeight": 1.5,
+			"fontStyle": "normal",
+			"fontWeight": "normal",
+			"textAlign": "center",
+			"textBaseline": "middle"
+		},
+		"animateCycleIndex": 0,
+		"events": [],
+		"eventFns": ["link", "doAnimate", "doFn", "doWindowFn"],
+		"tags": [],
+		"lineDashOffset": 0,
+		"text": "Conv2d",
+		"textOffsetX": 0,
+		"textOffsetY": 0,
+		"animateType": "",
+		"visible": true,
+		"data": {
+			"layer": {
+				"type": "Conv2d"
+			},
+			"parameters": [{
+				"label": "out_channels",
+				"type": "InputNumber",
+				"placeholder": "必填",
+				"options": {
+					"rules": [{
+						"required": true,
+						"message": "parameter is required"
+					}]
+				},
+				"value": 10
+			}, {
+				"label": "kernel_size",
+				"type": "InputNumber",
+				"placeholder": "必填",
+				"options": {
+					"rules": [{
+						"required": true,
+						"message": "parameter is required"
+					}]
+				},
+				"value": 1
+			}, {
+				"label": "stride",
+				"type": "InputNumber",
+				"placeholder": "默认1",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "padding",
+				"type": "InputNumber",
+				"placeholder": "默认0",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "dilation",
+				"type": "InputNumber",
+				"placeholder": "默认1",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "groups",
+				"type": "InputNumber",
+				"placeholder": "默认1",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				}
+			}, {
+				"label": "bias",
+				"type": "Radio",
+				"placeholder": "默认true",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				},
+				"option": [{
+					"text": "None"
+				}, {
+					"value": true,
+					"text": "true"
+				}, {
+					"value": false,
+					"text": "false"
+				}]
+			}, {
+				"label": "padding_mode",
+				"type": "Select",
+				"placeholder": "默认zeros",
+				"options": {
+					"rules": [{
+						"required": false
+					}]
+				},
+				"option": [{
+					"value": "zeros",
+					"text": "zeros"
+				}, {
+					"value": "reflect",
+					"text": "reflect"
+				}, {
+					"value": "replicate",
+					"text": "replicate"
+				}, {
+					"value": "circular",
+					"text": "circular"
+				}]
+			}]
+		},
+		"zRotate": 0,
+		"anchors": [{
+			"x": 285,
+			"y": 385,
+			"direction": 4
+		}, {
+			"x": 329.5,
+			"y": 367.5,
+			"direction": 1
+		}, {
+			"x": 374,
+			"y": 385,
+			"direction": 2
+		}, {
+			"x": 329.5,
+			"y": 402.5,
+			"direction": 3
+		}],
+		"rotatedAnchors": [{
+			"x": 285,
+			"y": 385,
+			"direction": 4
+		}, {
+			"x": 329.5,
+			"y": 367.5,
+			"direction": 1
+		}, {
+			"x": 374,
+			"y": 385,
+			"direction": 2
+		}, {
+			"x": 329.5,
+			"y": 402.5,
+			"direction": 3
+		}],
+		"animateDuration": 0,
+		"animateFrames": [],
+		"borderRadius": 0,
+		"iconSize": null,
+		"imageAlign": "center",
+		"gradientAngle": 0,
+		"gradientRadius": 0.01,
+		"paddingTop": 0,
+		"paddingBottom": 0,
+		"paddingLeft": 0,
+		"paddingRight": 0,
+		"paddingLeftNum": 0,
+		"paddingRightNum": 0,
+		"paddingTopNum": 0,
+		"paddingBottomNum": 0,
+		"textRect": {
+			"x": 320,
+			"y": 367.5,
+			"width": 54,
+			"height": 35,
+			"center": {
+				"x": 347,
+				"y": 385
+			},
+			"ex": 374,
+			"ey": 402.5
+		},
+		"fullTextRect": {
+			"x": 285,
+			"y": 367.5,
+			"width": 89,
+			"height": 35,
+			"center": {
+				"x": 329.5,
+				"y": 385
+			},
+			"ex": 374,
+			"ey": 402.5
+		},
+		"iconRect": {
+			"x": 285,
+			"y": 367.5,
+			"width": 35,
+			"height": 35,
+			"center": {
+				"x": 302.5,
+				"y": 385
+			},
+			"ex": 320,
+			"ey": 402.5
+		},
+		"fullIconRect": {
+			"x": 285,
+			"y": 367.5,
+			"width": 89,
+			"height": 35,
+			"center": {
+				"x": 329.5,
+				"y": 385
+			},
+			"ex": 374,
+			"ey": 402.5
+		},
+		"elementRendered": false
+	}, {
+		"id": "803c7a18",
+		"type": 1,
+		"name": "polyline",
+		"rect": {
+			"x": 0,
+			"y": 0,
+			"width": 0,
+			"height": 0,
+			"center": {
+				"x": 0,
+				"y": 0
+			},
+			"ex": 0,
+			"ey": 0
+		},
+		"lineWidth": 1,
+		"rotate": 0,
+		"offsetRotate": 0,
+		"globalAlpha": 1,
+		"dash": 0,
+		"strokeStyle": "#222",
+		"fillStyle": "",
+		"font": {
+			"color": "",
+			"fontFamily": "\"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial",
+			"fontSize": 12,
+			"lineHeight": 1.5,
+			"fontStyle": "normal",
+			"fontWeight": "normal",
+			"textAlign": "center",
+			"textBaseline": "middle",
+			"background": "#fff"
+		},
+		"animateCycleIndex": 0,
+		"events": [],
+		"eventFns": ["link", "doAnimate", "doFn", "doWindowFn"],
+		"tags": [],
+		"lineDashOffset": 0,
+		"textOffsetX": 0,
+		"textOffsetY": 0,
+		"visible": true,
+		"data": "",
+		"controlPoints": [{
+			"x": 385,
+			"y": 298.5,
+			"direction": 4,
+			"anchorIndex": 0,
+			"id": "4b8a981e"
+		}, {
+			"x": 329.5,
+			"y": 298.5
+		}, {
+			"x": 329.5,
+			"y": 333.5,
+			"direction": 1,
+			"anchorIndex": 1,
+			"id": "af79bc15"
+		}],
+		"fromArrowSize": 5,
+		"toArrowSize": 5,
+		"borderWidth": 0,
+		"borderColor": "#000000",
+		"animateColor": "",
+		"animateSpan": 1,
+		"animatePos": 0,
+		"isAnimate": false,
+		"animateFromSize": 0,
+		"animateToSize": 0,
+		"animateDotSize": 3,
+		"from": {
+			"x": 440,
+			"y": 298.5,
+			"direction": 4,
+			"anchorIndex": 0,
+			"id": "4b8a981e"
+		},
+		"to": {
+			"x": 329.5,
+			"y": 367.5,
+			"direction": 1,
+			"anchorIndex": 1,
+			"id": "af79bc15"
+		},
+		"fromArrow": "",
+		"toArrow": "triangleSolid",
+		"manualCps": false,
+		"textRect": null
+	}, {
+		"id": "20a83bec",
+		"type": 1,
+		"name": "polyline",
+		"rect": {
+			"x": 0,
+			"y": 0,
+			"width": 0,
+			"height": 0,
+			"center": {
+				"x": 0,
+				"y": 0
+			},
+			"ex": 0,
+			"ey": 0
+		},
+		"lineWidth": 1,
+		"rotate": 0,
+		"offsetRotate": 0,
+		"globalAlpha": 1,
+		"dash": 0,
+		"strokeStyle": "#222",
+		"fillStyle": "",
+		"font": {
+			"color": "",
+			"fontFamily": "\"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Helvetica, Arial",
+			"fontSize": 12,
+			"lineHeight": 1.5,
+			"fontStyle": "normal",
+			"fontWeight": "normal",
+			"textAlign": "center",
+			"textBaseline": "middle",
+			"background": "#fff"
+		},
+		"animateCycleIndex": 0,
+		"events": [],
+		"eventFns": ["link", "doAnimate", "doFn", "doWindowFn"],
+		"tags": [],
+		"lineDashOffset": 0,
+		"textOffsetX": 0,
+		"textOffsetY": 0,
+		"visible": true,
+		"data": "",
+		"controlPoints": [{
+			"x": 329.5,
+			"y": 447.5,
+			"direction": 3,
+			"anchorIndex": 3,
+			"id": "af79bc15"
+		}, {
+			"x": 329.5,
+			"y": 493
+		}, {
+			"x": 397,
+			"y": 493,
+			"direction": 4,
+			"anchorIndex": 0,
+			"id": 2
+		}],
+		"fromArrowSize": 5,
+		"toArrowSize": 5,
+		"borderWidth": 0,
+		"borderColor": "#000000",
+		"animateColor": "",
+		"animateSpan": 1,
+		"animatePos": 0,
+		"isAnimate": false,
+		"animateFromSize": 0,
+		"animateToSize": 0,
+		"animateDotSize": 3,
+		"from": {
+			"x": 329.5,
+			"y": 402.5,
+			"direction": 3,
+			"anchorIndex": 3,
+			"id": "af79bc15"
+		},
+		"to": {
+			"x": 464,
+			"y": 493,
+			"direction": 4,
+			"anchorIndex": 0,
+			"id": "0711f105"
+		},
+		"fromArrow": "",
+		"toArrow": "triangleSolid",
+		"manualCps": false,
+		"textRect": null
+	}],
+	"lineName": "polyline",
+	"scale": 1,
+	"locked": 0,
+	"data": ""
+}

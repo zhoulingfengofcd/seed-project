@@ -104,7 +104,7 @@ def search_network_path(starts: list, ends: list, adjacency: dict, inverse_adjac
 
         if node in ends:  # 是结束节点
             finish(finished, path)
-        elif node not in start and len(inverse_adjacency[node]) > 1:  # 不是开始节点，且依赖多个节点
+        elif node not in starts and len(inverse_adjacency[node]) > 1:  # 不是开始节点，且依赖多个节点
             is_visited = True
             for item in inverse_adjacency[node]:
                 if item not in finished and item not in path:
