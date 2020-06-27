@@ -90,63 +90,7 @@ def search_all_may(graph, start, end):
     return finished
 
 
-def searh_all_depend(starts: list, ends: list, adjacency: dict, inverse_adjacency: dict):
-    check = []
-    for start in starts:
-        check.append([start])
-    finished = []  # 最终保存的路径
-    branch = []
-    start_dict = dict()
-    end_dict = dict()
-    start_end_dict = dict()
-    new_branch_created = set()
-    check_visited = set()  # 已访问过的节点
-    finished_visited = set()
-    while check:
-        path = check.pop(0)
-
-        node = path[-1]  # 取路径最后一个节点
-
-        if node in ends:  # 是结束节点
-            for item in path:
-                finished.append(item)
-                finished_visited.add(item)
-        elif node not in start and len(inverse_adjacency[node]) > 1:  # 不是开始节点，且依赖多个节点
-            is_check_visited = True
-            is_finished_visited = True
-            for item in inverse_adjacency[node]:
-                if item not in check_visited:
-                    is_check_visited = False
-                if item not in finished_visited:
-                    is_finished_visited = False
-            if is_finished_visited and is_check_visited:
-                raise Exception("错误")
-            elif is_check_visited:
-                print()
-            elif is_finished_visited:
-                for item in adjacency[node]:
-                    check.append([item])
-                    check_visited.add(item)
-            else:
-                check.append(path)
-        elif len(adjacency[node]) > 1:  # 指向多个节点
-            for item in adjacency[node]:
-                check.append([item])
-                check_visited.add(item)
-
-        elif len(adjacency[node]) == 1:  # 指向一个节点
-            check.append(path + adjacency[node])
-            check_visited.add(adjacency[node][0])
-        else:
-            raise Exception("错误")
-
-    # while len(branch)>1:
-    #
-    #     for start_node in start_dict.keys():
-    #         for child_path in start_dict[start_node]:
-
-
-def search_all_path1(starts: list, ends: list, adjacency: dict, inverse_adjacency: dict):
+def search_network_path(starts: list, ends: list, adjacency: dict, inverse_adjacency: dict):
     check = []
     for start in starts:
         check.append([start])
@@ -157,8 +101,7 @@ def search_all_path1(starts: list, ends: list, adjacency: dict, inverse_adjacenc
         path = check.pop(-1)
 
         node = path[-1]  # 取路径最后一个节点
-        if node == 'a8a774f3':
-            print("")
+
         if node in ends:  # 是结束节点
             finish(finished, path)
         elif node not in start and len(inverse_adjacency[node]) > 1:  # 不是开始节点，且依赖多个节点
@@ -190,85 +133,9 @@ def finish(finished: list, path: list):
     for item in path:
         if item not in finished:
             finished.append(item)
-            # visited.add(item)
         else:
-            print("重复", item)
+            print("重复遍历节点", item)
             # raise Exception("exist value")
-
-
-def search_all_path(starts: list, ends: list, adjacency: dict, inverse_adjacency: dict):
-    check = []
-    for start in starts:
-        check.append([start])
-    finished = []  # 最终保存的路径
-    branch = []
-    start_dict = dict()
-    end_dict = dict()
-    start_end_dict = dict()
-    new_branch_created = set()
-    while check:
-        path = check.pop(-1)
-
-        node = path[-1]  # 取路径最后一个节点
-
-        if node in ends:  # 是结束节点
-            add_branch(branch, end_dict, path, start_dict, start_end_dict)
-        else:
-            if len(adjacency[node]) > 1:  # 指向多个节点
-                add_branch(branch, end_dict, path, start_dict, start_end_dict)
-                if node not in new_branch_created:
-                    for item in adjacency[node]:
-                        check.append([node, item])  # 指向的多个节点，成新分支
-                    new_branch_created.add(node)
-            elif node not in start and len(inverse_adjacency[node]) > 1:  # 不是开始节点，且依赖多个节点
-
-                add_branch(branch, end_dict, path, start_dict, start_end_dict)
-                if node not in new_branch_created:
-                    for item in adjacency[node]:
-                        check.append([node, item])  # 指向的节点，成新分支
-                    new_branch_created.add(node)
-            elif len(adjacency[node]) == 1:  # 指向一个节点
-                check.append(path + adjacency[node])  # 将指向的节点添加到该路径中
-            else:
-                raise Exception("Path to interrupt")
-
-    ok = []
-    check_path = start_dict.pop[starts[0]]
-    while len(start_dict.keys()) == 0:
-        for item in check_path:
-            if len(end_dict[item[-1]]) == 1:
-                ok = ok + check_path
-        check_path = []
-
-    for start_end_key in list(start_end_dict):
-        value = start_end_dict.pop(start_end_key)
-        if len(value) > 1:
-            value = value[0]
-            for item in value[1:]:
-                value = value + item[1:-1]
-            start_end_dict[start_end_key] = value
-        elif len(value) == 1:
-            print("~")
-        else:
-            raise Exception("Value None")
-
-
-def add_branch(branch, end_dict, path, start_dict, start_end_dict):
-    branch.append(path)  # 本条路径结束
-    if path[0] in start_dict.keys():
-        start_dict[path[0]].append(path)
-    else:
-        start_dict[path[0]] = [path]
-    if path[-1] in end_dict.keys():
-        end_dict[path[-1]].append(path)
-    else:
-        end_dict[path[-1]] = [path]
-
-    key = path[0] + "/" + path[-1]
-    if key in start_end_dict.keys():
-        start_end_dict[key].append(path)
-    else:
-        start_end_dict[key] = [path]
 
 
 if __name__ == '__main__':
