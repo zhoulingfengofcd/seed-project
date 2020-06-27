@@ -125,7 +125,7 @@ def search_network_path(starts: list, ends: list, adjacency: dict, inverse_adjac
             check.append(path + adjacency[node])  # 将指向的节点添加到该路径中
         else:
             raise Exception("Path to interrupt")
-    print(finished)
+    print("网络节点计算顺序", finished)
     return finished
 
 

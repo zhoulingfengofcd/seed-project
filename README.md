@@ -27,9 +27,9 @@ model_arts_train.py 华为云训练脚本
 在nets/model下定义了个类class Model，其根据一个字典定义，创建模型，其设计是将网络作为一个有向图来定义，参数配置：  
 {  
 &nbsp;&nbsp;&nbsp;&nbsp;net：网络模型参数    
-&nbsp;&nbsp;&nbsp;&nbsp;layers：每层具体定义，并作为图的节点    
+&nbsp;&nbsp;&nbsp;&nbsp;layers：每层具体参数定义，其每个层作为图的节点    
 &nbsp;&nbsp;&nbsp;&nbsp;adjacency：图节点的邻接表，网络的连接由邻接表指定    
-&nbsp;&nbsp;&nbsp;&nbsp;start_and_end：输入、输出列表，支持多输入、多输出  
+&nbsp;&nbsp;&nbsp;&nbsp;start_and_end：输入、输出列表(支持多输入、多输出)  
 }  
 备注：layers内参数：请参考pytorch的对应方法参数  
 

@@ -186,6 +186,7 @@ def create_model(net: dict, layers: dict, adjacency: dict, start_and_end: dict):
     out_channels_dict = dict()
 
     path_list = search_network_path(start_node, output_node, adjacency, inverse_adjacency)
+    print("计算节点数量={}".format(len(path_list)))
     if path_list is None or len(path_list) == 0:
         raise Exception("The start `{}` to end `{}` node path does not exist".format(start_node, output_node))
 
@@ -425,6 +426,8 @@ def load_model_from_json(path, in_channels):
             model_defs['adjacency'][line['from']['id']].append(line['to']['id'])
         else:
             model_defs['adjacency'][line['from']['id']] = [line['to']['id']]
+
+    print("配置文件节点数量={}".format(len(model_defs['layers'].keys())))
 
     model = Model(model_defs=model_defs)
     return model
