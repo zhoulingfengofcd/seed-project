@@ -4,12 +4,12 @@ import torch.nn.functional as F
 from enum import Enum
 
 
-def _bbox_wh_iou(wh1, wh2):
+def bbox_wh_iou(wh1, wh2):
     """
     求中心点重合的box的iou, 注意本方法已经假设传入的box中心点是重合的
     支持1对1,1对n(某个box与其他n个box的iou值)，n对n(跟1对1类似，最后求得对应位置的box的iou)，不支持m对n
-    :param wh1: shape=(-1, 2),最后一维为(w,h)
-    :param wh2: shape=(-1, 2),最后一维为(w,h)
+    :param wh1: shape=(-1, 2),最后一维为(w,h) 或 (h,w), wh1、wh2顺序保持一致即可
+    :param wh2: shape=(-1, 2),最后一维为(w,h) 或 (h,w), wh1、wh2顺序保持一致即可
     :return: 输出纬度跟随输入-1的最大纬度，shape=(-1)，wh1的-1纬度可以不与wh2的-1纬度一致，如wh1.shape=(2), wh2.shape=(2,2), 则输出=(2)
     """
     # wh2 = wh2.t()
@@ -20,20 +20,26 @@ def _bbox_wh_iou(wh1, wh2):
     return inter_area / union_area
 
 
-def _bbox_iou(box1, box2, x1y1x2y2=True):
+def bbox_iou(box1, box2, x1y1x2y2=True):
     """
     求bounding boxs的iou
     :param box1: shape = (-1,4), example: box1.shape=box2.shape=(4) or (1,4)  or (1,2,4) 只需保证最后一维为4
     :param box2: shape = (-1,4), example: box1.shape=box2.shape=(4) or (1,4)  or (1,2,4) 只需保证最后一维为4
-    :param x1y1x2y2: True box (x1,y1,x2,y2), False, box (x,y,w,h)
+    :param x1y1x2y2: True box (x1,y1,x2,y2), False, box (x,y,h,w)
     :return: 输出纬度跟随输入纬度,如输入(-1,4), 输出(-1), 注意要保证box1、box2前边-1的纬度一致
     """
     if not x1y1x2y2:
         # Transform from center and width to exact coordinates
-        b1_x1, b1_x2 = box1[..., 0] - box1[..., 2] / 2, box1[..., 0] + box1[..., 2] / 2
-        b1_y1, b1_y2 = box1[..., 1] - box1[..., 3] / 2, box1[..., 1] + box1[..., 3] / 2
-        b2_x1, b2_x2 = box2[..., 0] - box2[..., 2] / 2, box2[..., 0] + box2[..., 2] / 2
-        b2_y1, b2_y2 = box2[..., 1] - box2[..., 3] / 2, box2[..., 1] + box2[..., 3] / 2
+        # box (x,y,w,h)
+        # b1_x1, b1_x2 = box1[..., 0] - box1[..., 2] / 2, box1[..., 0] + box1[..., 2] / 2
+        # b1_y1, b1_y2 = box1[..., 1] - box1[..., 3] / 2, box1[..., 1] + box1[..., 3] / 2
+        # b2_x1, b2_x2 = box2[..., 0] - box2[..., 2] / 2, box2[..., 0] + box2[..., 2] / 2
+        # b2_y1, b2_y2 = box2[..., 1] - box2[..., 3] / 2, box2[..., 1] + box2[..., 3] / 2
+        # box (x,y,h,w)
+        b1_x1, b1_x2 = box1[..., 0] - box1[..., 3] / 2, box1[..., 0] + box1[..., 3] / 2
+        b1_y1, b1_y2 = box1[..., 1] - box1[..., 2] / 2, box1[..., 1] + box1[..., 2] / 2
+        b2_x1, b2_x2 = box2[..., 0] - box2[..., 3] / 2, box2[..., 0] + box2[..., 3] / 2
+        b2_y1, b2_y2 = box2[..., 1] - box2[..., 2] / 2, box2[..., 1] + box2[..., 2] / 2
     else:
         # Get the coordinates of bounding boxes
         b1_x1, b1_y1, b1_x2, b1_y2 = box1[..., 0], box1[..., 1], box1[..., 2], box1[..., 3]

@@ -35,8 +35,8 @@ def train(in_channels, out_channels, net_name, lr, csv_path, load_data,
 
     # 网络
     net = create_net(in_channels, out_channels, net_name, **kwargs)
-    net.train()  # 启用 BatchNormalization 和 Dropout
-    # net.eval()  # 不启用 BatchNormalization 和 Dropout, see https://pytorch.org/docs/stable/nn.html?highlight=module%20eval#torch.nn.Module.eval
+    net.train()  # 训练 BatchNormalization 和 Dropout
+    # net.eval()  # 固定 BatchNormalization 和 Dropout, see https://pytorch.org/docs/stable/nn.html?highlight=module%20eval#torch.nn.Module.eval
     net = net.to(device)
     if load_state_dict_path is not None:
         net.load_state_dict(torch.load(load_state_dict_path))
@@ -101,7 +101,7 @@ def valid(net, csv_path, load_data, batch_size, resize, crop_offset, num_classes
     """
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    net.eval()  # 不启用 BatchNormalization 和 Dropout, see https://pytorch.org/docs/stable/nn.html?highlight=module%20eval#torch.nn.Module.eval
+    net.eval()  # 固定 BatchNormalization 和 Dropout, see https://pytorch.org/docs/stable/nn.html?highlight=module%20eval#torch.nn.Module.eval
 
     # 准备数据
     df = pd.read_csv(csv_path)
@@ -162,8 +162,8 @@ def train_valid(in_channels, out_channels, net_name, lr,
 
     # 网络
     net = create_net(in_channels, out_channels, net_name, **kwargs)
-    net.train()  # 启用 BatchNormalization 和 Dropout
-    # net.eval()  # 不启用 BatchNormalization 和 Dropout, see https://pytorch.org/docs/stable/nn.html?highlight=module%20eval#torch.nn.Module.eval
+    net.train()  # 训练 BatchNormalization 和 Dropout
+    # net.eval()  # 固定 BatchNormalization 和 Dropout, see https://pytorch.org/docs/stable/nn.html?highlight=module%20eval#torch.nn.Module.eval
     net = net.to(device)
     if load_state_dict_path is not None:
         net.load_state_dict(torch.load(load_state_dict_path))
@@ -245,8 +245,8 @@ def test(in_channels, out_channels, net_name,
 
     # 网络
     net = create_net(in_channels, out_channels, net_name, **kwargs)
-    # net.train()  # 启用 BatchNormalization 和 Dropout
-    net.eval()  # 不启用 BatchNormalization 和 Dropout, see https://pytorch.org/docs/stable/nn.html?highlight=module%20eval#torch.nn.Module.eval
+    # net.train()  # 训练 BatchNormalization 和 Dropout
+    net.eval()  # 固定 BatchNormalization 和 Dropout, see https://pytorch.org/docs/stable/nn.html?highlight=module%20eval#torch.nn.Module.eval
     net = net.to(device)
     # Load checkpoint weights
     net.load_state_dict(torch.load(weights_path))

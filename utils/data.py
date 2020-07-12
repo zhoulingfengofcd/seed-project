@@ -7,9 +7,10 @@ import torch
 import os
 from typing import Tuple
 
-from torch.autograd import Variable
+from utils.data_augment import DataAugmentForObjectDetection
 from utils.file import *
 import warnings
+from utils.xml_helper import *
 
 
 def encoded(labels):
@@ -79,7 +80,7 @@ def decode_rgb(labels):
     :param labels: shape=(n,h,w)
     :return: shape=(n,h,w,3)
     """
-    decoded_labels = torch.zeros(size=labels.shape+(3,), dtype=torch.uint8)
+    decoded_labels = torch.zeros(size=labels.shape + (3,), dtype=torch.uint8)
     # 1
     decoded_labels[labels == 1] = torch.tensor([204, 50, 150], dtype=torch.uint8)
     # 2
@@ -219,6 +220,147 @@ def data_generator(load_data, image_list, label_list, batch_size, resize: Tuple,
                     out_images = []
                     out_labels = []
                     out_images_filename = []
+
+
+def detection_data_generator(load_data, image_list, label_list, batch_size, load_classes,
+                             resize: Tuple,
+                             crop_offset: Tuple = (0, 0),
+                             is_aug=True
+                             ):
+    """
+    生成训练数据
+    :param load_data: 加载数据function, 返回数据root_path
+    :param image_list: 图片文件的数据集地址
+    :param label_list: 标签文件的数据集地址
+    :param batch_size: 每批取多少张图片
+    :param classes: 分类类别列表
+    :return: out_images=shape(batch_size,c,h,w),
+    out_labels=[[batch_size, class_index, x_center, y_center, height, width], ...]
+    """
+    indices = np.arange(0, len(image_list))  # 索引
+    out_images = []
+    out_labels = []
+
+    root_path = load_data()
+    print("The load data root path %s" % root_path)
+    check_path = os.path.join(root_path, image_list[0])
+    if not os.path.isfile(check_path):
+        print_dir(root_path)
+        raise Exception("Check that the data set path `{}` is correct".format(check_path))
+
+    classes = load_classes()
+    while True:
+        np.random.shuffle(indices)
+        for i in indices:
+            try:
+                image = cv2.imread(os.path.join(root_path, image_list[i]))  # (h,w,c) BGR格式
+                # label = cv2.imread(os.path.join(root_path, label_list[i]), cv2.IMREAD_GRAYSCALE)  # (h,w)
+                # label = parse_convert_xml(os.path.join(root_path, label_list[i]))  # [[x_center, y_center, height, width, name], ...]
+                label = parse_xml(os.path.join(root_path, label_list[i]), list(image.shape[:2]))  # [[x_min, y_min, x_max, y_max, name]]
+            except ValueError as e:
+                raise e
+            except BaseException:  # 发生异常，执行代码
+                warnings.warn("The image file `{}` or label file `{}` is no exists".format(
+                    os.path.join(root_path, image_list[i]),
+                    os.path.join(root_path, label_list[i])))
+            else:  # 如果没有异常执行这块代码
+                if image is None or label is None:
+                    warnings.warn("The image file `{}` or label file `{}` is no exists".format(
+                        os.path.join(root_path, image_list[i]),
+                        os.path.join(root_path, label_list[i])))
+                    continue
+                if is_aug:
+                    # 数据增强(平移/改变亮度/加噪声/翻转)
+                    data_aug = DataAugmentForObjectDetection(crop_rate=0, rotation_rate=0, cutout_rate=0)
+                    image, bboxes = data_aug.data_augment(image,
+                                                          [coord[:4] for coord in label],
+                                                          os.path.join(root_path, image_list[i]),
+                                                          os.path.join(root_path, label_list[i])
+                                                          )
+                    # label[:, :4] = convert_xyxy2xyhw(list(image.shape[:2]), bboxes)
+                    label = [item[0]+[item[1][-1]] for item in zip(convert_xyxy2xyhw(list(image.shape[:2]), bboxes), label)]
+                else:
+                    label = [item[0] + [item[1][-1]] for item in
+                             zip(convert_xyxy2xyhw(list(image.shape[:2]), [coord[:4] for coord in label]), label)]
+
+                if resize is not None and crop_offset is not None:
+                    # crop & resize
+                    image, _ = crop_resize(image, None, resize,
+                                           crop_offset)  # image=shape(h,w,c), label=shape(h,w)
+
+                out_images.append(image)
+                out_labels = out_labels + [
+                    [len(out_images) - 1] + [classes.index(auged_bbox[1][4])] + auged_bbox[0][:4] for auged_bbox in zip(label, label)
+                ]  # [[batch_size, class_index, x_center, y_center, height, width], ...]
+
+                if len(out_images) == batch_size:
+                    out_images = np.array(out_images, dtype=np.float32)
+                    out_labels = np.array(out_labels, dtype=np.float32)
+                    # BGR转换成RGB
+                    out_images = out_images[:, :, :, ::-1]
+                    # 维度改成(n,c,h,w)
+                    out_images = out_images.transpose(0, 3, 1, 2)
+                    # 归一化 -1 ~ 1
+                    out_images = out_images * 2 / 255 - 1
+                    yield torch.from_numpy(out_images), torch.from_numpy(out_labels)
+                    out_images = []
+                    out_labels = []
+
+
+def hpmp_data_generator(data_path, batch_size):
+    """
+    生成训练数据
+    :param load_data: 加载数据function, 返回数据root_path
+    :param image_list: 图片文件的数据集地址
+    :param label_list: 标签文件的数据集地址
+    :param batch_size: 每批取多少张图片
+    :param resize: 输出的图片尺寸，(h,w)
+    :param crop_offset: 将原始图片截掉多少，(start_height, start_width)
+    :return: out_images=shape(batch_size,c,h,w),out_labels=shape(batch_size,h,w)
+    """
+    out_images = []
+    out_labels = []
+
+    print("The load data data path %s" % data_path)
+    image_list = get_all_filename(data_path)
+    check_path = image_list[0]
+    if not os.path.isfile(check_path):
+        raise Exception("Check that the data set path `{}` is correct".format(check_path))
+
+    indices = np.arange(0, len(image_list))  # 索引
+
+    all_standard_dict = get_all_image(r"D:\AI\project\aigame\outputs\all")
+
+    while True:
+        np.random.shuffle(indices)
+        for i in indices:
+            try:
+                image = Image.open(image_list[i])  # (h,w,c) RGB格式
+                label = get_image_hpmp(image_list[i],
+                                       [43, 14, 138 + 1, 23 + 1],
+                                       [43, 30, 138 + 1, 39 + 1],
+                                       all_standard_dict)  # 2,2,digital_bits
+            except:  # 发生异常，执行这块代码
+                warnings.warn("The image file `{}` or label handle `{}` is error".format(image_list[i]))
+            else:  # 如果没有异常执行这块代码
+                if image is None:
+                    warnings.warn("The image file `{}` is no exists".format(image_list[i]))
+                    continue
+
+                out_images.append(np.array(image))
+                out_labels.append(label)
+
+                if len(out_images) == batch_size:
+                    out_images = np.array(out_images, dtype=np.float32)
+                    out_labels = np.array(out_labels, dtype=np.int64)
+
+                    # 维度改成(n,c,h,w)
+                    out_images = out_images.transpose(0, 3, 1, 2)
+                    # 归一化 -1 ~ 1
+                    out_images = out_images * 2 / 255 - 1
+                    yield torch.from_numpy(out_images), torch.from_numpy(out_labels).long()
+                    out_images = []
+                    out_labels = []
 
 
 def _test_data_generator(image_list, batch_size, resize: Tuple,

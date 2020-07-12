@@ -1,8 +1,16 @@
 import os
 import shutil
+from collections import OrderedDict
+
 import torch
 import zipfile
 import json
+import codecs
+import warnings
+import numpy as np
+from PIL import ImageChops
+from PIL.Image import Image
+
 try:
     import moxing as mox
     mox.file.shift('os', 'mox')
@@ -57,17 +65,103 @@ def print_dir(root_path):
             print_dir(file_path)
 
 
-def get_all_filename(root_path):
+def get_all_filename(root_path, reshape=None):
     all_filename = []
     dir_files = os.listdir(root_path)  # 得到该文件夹下所有的文件(包括目录)
     for file in dir_files:
         file_path = os.path.join(root_path, file)  # 路径拼接成绝对路径
         if os.path.isfile(file_path):  # 如果文件
             all_filename.append(file_path)
+    if reshape is None:
+        return all_filename
+    else:
+        return np.array(all_filename).reshape(reshape).tolist()
+
+
+def get_all_image(root_path):
+    all_filename = OrderedDict()
+    dir_files = os.listdir(root_path)  # 得到该文件夹下所有的文件(包括目录)
+    for file in dir_files:
+        file_path = os.path.join(root_path, file)  # 路径拼接成绝对路径
+        if os.path.isfile(file_path):  # 如果文件
+            all_filename[os.path.splitext(file)[0]] = Image.open(file_path)
+
     return all_filename
 
 
-def copy_dataset(copy_to_local_root, source_data_path=None):
+def get_image_hpmp(image, hp_crop_size, mp_crop_size, standard_img_dict):
+    """
+    获取图片HPMP数字
+    :param img1:
+    :param size1: 截取的矩形坐标(left, top, right, bottom), 包括left、top, 不包括right、bottom
+    :param img2:
+    :param size2:
+    :return:
+    """
+    ori_image = Image.open(image)
+
+    hp = _get_digital_value(ori_image, hp_crop_size, standard_img_dict)
+
+    if hp is None:
+        return None
+    else:
+        mp = _get_digital_value(ori_image, mp_crop_size, standard_img_dict)
+    return [hp, mp]
+
+
+def _get_digital_value(ori_image, crop_size, standard_img_dict):
+    hp_image = ori_image.crop(crop_size)
+    # plt.imshow(hp_image)
+    # plt.show()
+    hp_num = hp_image.size[0] // 6
+    # print("最大数字位数", hp_num)
+    hp_value = [[], []]  # 当前值/总量
+    hp_flag = 0  # 0:待检测 1:遍历当前值 2:遍历总量 3:结束
+    for i in range(int(hp_num)):
+        if hp_flag != 3:
+            display_rect = hp_image.crop((i * 6, 0, (i + 1) * 6, hp_image.size[1]))
+            for key in standard_img_dict.keys():
+                diff_value = ImageChops.difference(standard_img_dict[key], display_rect)
+                diff_value = np.array(diff_value).sum()
+
+                if diff_value < 1000:
+                    if key == 'blank':  # 空白
+                        if hp_flag == 0:
+                            # return None
+                            hp_flag = 3  # 结束
+                            break
+                        elif hp_flag == 2:
+                            # return hp_value
+                            hp_flag = 3  # 结束
+                            break
+                    elif key == 'slash':  # 斜杠
+                        if hp_flag == 0:
+                            raise Exception("数据异常")
+                        elif hp_flag == 1:
+                            hp_flag = 2
+                    else:
+                        if hp_flag == 0:
+                            hp_flag = 1
+                            hp_value[0].append(int(key)+1)
+                        elif hp_flag == 1:
+                            hp_value[0].append(int(key)+1)
+                        elif hp_flag == 2:
+                            hp_value[1].append(int(key)+1)
+                    break
+            if hp_flag == 0:  # 没有匹配的补0
+                hp_value[0].append(0)
+                hp_value[1].append(0)
+        else:
+            hp_value[0].append(0)
+            hp_value[1].append(0)
+    for item in hp_value:  # 不足num数量，补0
+        for i in range(hp_num-len(item)):
+            item.append(0)
+    # print("解析值", hp_value)
+    return hp_value
+
+
+def copy_dataset(copy_to_local_root, source_data_path=None, extract_path=None):
     """
     拷贝数据
     :param copy_to_local_root: 数据拷贝目录, 如果目录已存在, 则将不会拷贝, 否则将拷贝, 如果源数据是zip文件, 拷贝后将解压, 返回解压后的目录
@@ -103,8 +197,10 @@ def copy_dataset(copy_to_local_root, source_data_path=None):
                     with zipfile.ZipFile(cached_file) as cached_zipfile:
                         members = cached_zipfile.infolist()
                         if not (members[0].filename.count("/") == 1 and members[1].filename.count("/") > 1):
-                            raise RuntimeError('Only one file(not dir) is allowed in the zipfile the first menber.')
-                        cached_zipfile.extractall(local_data_root)
+                            # raise RuntimeError('Only one file(not dir) is allowed in the zipfile the first menber.')
+                            warnings.warn("There are multiple directories or files in the compressed file")
+                        print("The zipfile members zero and one info:", members[0].filename, members[1].filename)
+                        cached_zipfile.extractall(local_data_root if extract_path is None else os.path.join(local_data_root, extract_path))
                         extraced_name = members[0].filename
                         cached_file = os.path.join(local_data_root, extraced_name)
                         print("unzip success, cached_file is %s" % cached_file)
@@ -147,6 +243,34 @@ def read_json(path):
     # 读取json文件内容,返回字典格式
     with open(path, 'r', encoding='utf8')as fp:
         return json.load(fp)
+
+
+def readlines(classes_path):
+    """
+    读取文件所有行数据，返回list
+    :param classes_path: 文件路径
+    :return: list每一项为每行数据
+    """
+    '''loads the classes'''
+    with codecs.open(classes_path, 'r', 'utf-8') as f:
+        class_names = f.readlines()
+    class_names = [c.strip() for c in class_names]
+    return class_names
+
+
+def read_lines(classes_path):
+    def _readlines():
+        """
+        读取文件所有行数据，返回list
+        :param classes_path: 文件路径
+        :return: list每一项为每行数据
+        """
+        '''loads the classes'''
+        with codecs.open(classes_path, 'r', 'utf-8') as f:
+            class_names = f.readlines()
+        class_names = [c.strip() for c in class_names]
+        return class_names
+    return _readlines
 
 
 if __name__ == '__main__':

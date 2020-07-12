@@ -138,13 +138,21 @@ class Interpolate(nn.Module):
         self.recompute_scale_factor = recompute_scale_factor
 
     def forward(self, x):
-        x = F.interpolate(input=x,
-                          size=self.size,
-                          scale_factor=self.scale_factor,
-                          mode=self.mode,
-                          align_corners=self.align_corners,
-                          recompute_scale_factor=self.recompute_scale_factor
-                          )
+        if self.recompute_scale_factor is None:  # 兼容1.3.0
+            x = F.interpolate(input=x,
+                              size=self.size,
+                              scale_factor=self.scale_factor,
+                              mode=self.mode,
+                              align_corners=self.align_corners
+                              )
+        else:
+            x = F.interpolate(input=x,
+                              size=self.size,
+                              scale_factor=self.scale_factor,
+                              mode=self.mode,
+                              align_corners=self.align_corners,
+                              recompute_scale_factor=self.recompute_scale_factor
+                              )
         return x
 
 
@@ -270,7 +278,7 @@ class Model(nn.Module):
         super(Model, self).__init__()
         if "net" not in model_defs.keys() or "layers" not in model_defs.keys() or "adjacency" not in model_defs.keys() \
                 or "start_and_end" not in model_defs.keys():
-            raise Exception("The model_def need to define the `net` `layers` `adjacency` `start_and_end` parameter")
+            raise Exception("The model_defs need to define the `net` `layers` `adjacency` `start_and_end` parameter")
 
         net = model_defs["net"]
         layers = model_defs["layers"]
@@ -345,6 +353,7 @@ class Model(nn.Module):
                     model_outputs[self.output_node.index(key)] = result
             except BaseException as e:
                 raise Exception("node `{}`".format(key) + str(e.args))
+
         return model_outputs
 
 
@@ -546,11 +555,12 @@ if __name__ == '__main__':
     # graph += "}\n"
     # print(graph)
 
-    model = load_model_from_json2("test/test5.json", 3)
+    model = load_model_from_json1("yolo/yolov3-44.json", 3)
     print(model)
-    input = torch.rand(1, 3, 224, 224)
+    input = torch.rand(1, 3, 416, 416)
     outputs = model(input)
-    print(outputs[0].shape)
+    for output in outputs:
+        print(output.shape)
     # from utils.file import save_model
     # save_model(r'D:\AI\project\data\weights')(model, "test1")
 
